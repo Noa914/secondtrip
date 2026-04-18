@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#FFC72C"/>
+<title>3 Second Trip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --brand:#FFC72C; --brand-soft:#FFE27A; --brand-bg:#FFF7DB;
+    --ink:#1A1A1A; --ink-2:#3A3A3A; --muted:#6B7280;
+    --line:#E8E8E8; --card:#FFFFFF;
+    --green:#2E7D4A; --red:#D64545; --orange:#F08A1F; --blue:#3B5BDB;
+    --shadow: 0 12px 30px rgba(0,0,0,0.08);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;overflow:hidden;font-family:'Noto Sans KR','Inter',-apple-system,sans-serif;color:var(--ink);background:#222}
+
+  /* ===== 데스크톱에서는 폰 프레임, 모바일에서는 전체화면 ===== */
+  .stage{
+    width:100%;height:100%;display:flex;align-items:center;justify-content:center;
+    background:
+      radial-gradient(circle at 20% 20%, #2a2a2a 0%, #111 60%);
+  }
+  .phone{
+    width:100%;height:100%;max-width:430px;max-height:900px;
+    background:#fff;border-radius:0;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;box-shadow:0 40px 80px rgba(0,0,0,0.5);
+  }
+  @media (min-width: 500px) and (min-height: 700px){
+    .phone{border-radius:42px;border:10px solid #111;outline:2px solid #333}
+  }
+
+  .view{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    background:#fff;z-index:1;
+  }
+  .view.active{transform:translateX(0);z-index:2}
+  .view.prev{transform:translateX(-30%);z-index:1;filter:brightness(.85)}
+  .view-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .view-scroll::-webkit-scrollbar{width:0}
+
+  /* ===== 공통 UI ===== */
+  .topbar{
+    display:flex;align-items:center;gap:10px;padding:14px 18px 6px 18px;
+    flex-shrink:0;background:#fff;z-index:5;
+  }
+  .iconbtn{
+    width:38px;height:38px;border-radius:50%;background:#F2F2F2;border:none;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;font-size:18px;color:#111;
+  }
+  .iconbtn:active{transform:scale(0.94)}
+  .topbar .title{font-size:15px;font-weight:700;flex:1;text-align:center;margin-right:38px}
+  .topbar .right{margin-left:auto}
+
+  .step-dots{display:flex;gap:5px;flex:1;justify-content:center;margin-right:38px}
+  .step-dots .d{width:22px;height:4px;border-radius:2px;background:#EEE;transition:.3s}
+  .step-dots .d.on{background:var(--brand)}
+
+  .btn{
+    width:100%;padding:17px;border-radius:14px;font-weight:700;font-size:16px;
+    border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;
+    font-family:inherit;transition:transform .1s;
+  }
+  .btn:active{transform:scale(0.98)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .btn-primary{background:var(--brand);color:#111}
+  .btn-dark{background:#111;color:#fff}
+  .btn-ghost{background:#F5F5F5;color:#333}
+
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border-radius:999px;font-size:11px;font-weight:600;background:#F4F4F4;color:#333}
+  .pill.brand{background:var(--brand-bg);color:#8B5E00}
+  .pill.green{background:#E5F5EC;color:var(--green)}
+  .pill.red{background:#FDECEC;color:var(--red)}
+  .pill.orange{background:#FFF1DB;color:var(--orange)}
+
+  .footer-cta{padding:14px 18px 22px 18px;background:#fff;border-top:1px solid var(--line);flex-shrink:0}
+
+  /* ===== 1. Splash ===== */
+  .splash{background:var(--brand);padding:28px 24px;position:relative;overflow:hidden;align-items:stretch;justify-content:flex-start}
+  .splash .bubble{position:absolute;border-radius:50%;background:#ffffff2e;pointer-events:none}
+  .splash .b1{width:260px;height:260px;top:-80px;right:-80px}
+  .splash .b2{width:320px;height:320px;bottom:-120px;left:-120px}
+  .splash-center{
+    flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;
+    position:relative;z-index:2;padding:20px 0;gap:22px;
+  }
+  .splash-logo{font-size:60px;font-weight:800;letter-spacing:-2px;line-height:1.05;color:#111;text-align:center}
+  .splash-sub{font-size:15px;line-height:1.55;color:#222;text-align:center;font-weight:500}
+  .splash-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:320px}
+  .splash-tags .t{background:#111;color:var(--brand);padding:7px 13px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+  .splash .cta{position:relative;z-index:2;flex-shrink:0;padding-bottom:8px}
+  .splash .cta-sub{text-align:center;margin-top:14px;font-size:12px;color:#111;font-weight:600}
+  .splash .cta-sub a{color:#111;text-decoration:underline}
+
+  /* ===== 2. 입력 폼 ===== */
+  .form-wrap{padding:6px 22px 22px 22px}
+  .h-title{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.25}
+  .h-sub{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .field{margin-top:22px}
+  .field-label{font-size:12px;font-weight:700;color:#666;margin-bottom:10px;letter-spacing:.3px}
+
+  .dest-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .dest-card{
+    border:1.5px solid #EEE;border-radius:14px;padding:14px;cursor:pointer;background:#fff;
+    display:flex;gap:10px;align-items:center;
+  }
+  .dest-card.on{border-color:#111;background:var(--brand-bg)}
+  .dest-card .flag{font-size:24px}
+  .dest-card .nm{font-size:14px;font-weight:700}
+  .dest-card .sub{font-size:10.5px;color:var(--muted)}
+  .dest-custom{
+    width:100%;padding:13px 14px;border:1.5px solid #EEE;border-radius:12px;
+    font-size:14px;font-family:inherit;margin-top:10px;background:#fff;outline:none;
+  }
+  .dest-custom:focus{border-color:var(--brand)}
+
+  .date-row{display:flex;gap:10px}
+  .date-input{flex:1;padding:14px;border:1.5px solid #EEE;border-radius:12px;font-size:14px;font-family:inherit;background:#fff;outline:none;color:#111;font-weight:600}
+  .date-input:focus{border-color:var(--brand)}
+
+  .budget-box{background:#111;border-radius:16px;padding:18px;color:#fff}
+  .budget-amt{font-size:28px;font-weight:800;color:var(--brand);margin-top:4px}
+  .slider-wrap{margin-top:14px}
+  .slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:#333;border-radius:3px;outline:none}
+  .slider::-webkit-slider-thumb{
+    -webkit-appearance:none;appearance:none;width:20px;height:20px;border-radius:50%;
+    background:var(--brand);cursor:pointer;border:3px solid #fff
+  }
+  .slider::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--brand);cursor:pointer;border:3px solid #fff}
+  .budget-ticks{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:6px}
+
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .chip-card{
+    border:1.5px solid #EEE;border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;
+    background:#fff;display:flex;flex-direction:column;gap:4px;align-items:center;
+  }
+  .chip-card .emj{font-size:22px}
+  .chip-card .lb{font-size:12px;font-weight:700}
+  .chip-card.on{border-color:#111;background:var(--brand-bg)}
+
+  .comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+  .comp-chip{
+    border:1.5px solid #EEE;border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;
+    font-size:12.5px;font-weight:700;background:#fff;
+  }
+  .comp-chip.on{border-color:#111;background:var(--brand-bg)}
+
+  /* ===== 3. Loading ===== */
+  .loading{background:linear-gradient(160deg,#FFE27A 0%,#FFC72C 100%);justify-content:center;align-items:center;padding:32px;text-align:center;position:relative;overflow:hidden}
+  .timer{
+    width:160px;height:160px;border-radius:50%;background:#fff;
+    display:flex;align-items:center;justify-content:center;flex-direction:column;
+    box-shadow:0 20px 40px rgba(0,0,0,.12);position:relative;
+  }
+  .timer::before{
+    content:"";position:absolute;inset:-10px;border-radius:50%;
+    border:3px dashed #fff;animation:spin 8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .timer-num{font-size:48px;font-weight:800;color:#111;line-height:1}
+  .timer-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
+  .loading-title{font-size:22px;font-weight:800;margin-top:30px;color:#111;line-height:1.3}
+  .loading-sub{font-size:12px;color:#333;margin-top:8px;max-width:280px}
+  .ls-list{margin-top:24px;width:100%;max-width:320px}
+  .ls{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#fff9;border-radius:10px;margin-bottom:7px;font-size:12px;font-weight:600;color:#333;text-align:left}
+  .ls .dot{width:8px;height:8px;border-radius:50%;background:#BBB;flex-shrink:0}
+  .ls.done .dot{background:var(--green)}
+  .ls.doing .dot{background:var(--orange);animation:pulse 1s infinite}
+  .ls.idle{opacity:.5}
+  @keyframes pulse{50%{transform:scale(1.5);opacity:.5}}
+
+  /* ===== 4. Result ===== */
+  .result-head{
+    background:var(--brand);padding:4px 18px 18px 18px;flex-shrink:0;
+  }
+  .result-head .rh-top{display:flex;align-items:center;gap:10px;padding:10px 0}
+  .result-head .iconbtn{background:#111;color:var(--brand)}
+  .result-head h2{font-size:22px;font-weight:800;color:#111;margin-top:4px}
+  .result-head .sub{font-size:12px;color:#333;margin-top:2px}
+  .result-stats{display:flex;gap:8px;margin-top:14px}
+  .rs{flex:1;background:#fff;border-radius:12px;padding:10px 12px}
+  .rs .lbl{font-size:10px;color:var(--muted);font-weight:600}
+  .rs .val{font-size:15px;font-weight:800;color:#111;margin-top:2px}
+
+  .day-tabs{display:flex;gap:8px;padding:14px 18px 6px 18px;overflow-x:auto;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line)}
+  .day-tabs::-webkit-scrollbar{display:none}
+  .day-tab{padding:8px 14px;border-radius:10px;background:#F3F3F3;font-size:12px;font-weight:700;color:#555;white-space:nowrap;flex-shrink:0;cursor:pointer;border:none;font-family:inherit}
+  .day-tab.on{background:#111;color:#fff}
+
+  .timeline{padding:16px 18px 16px 40px;position:relative}
+  .timeline::before{content:"";position:absolute;left:24px;top:22px;bottom:22px;width:2px;background:#EEE}
+  .tl-item{position:relative;margin-bottom:14px}
+  .tl-item::before{
+    content:"";position:absolute;left:-21px;top:8px;width:13px;height:13px;border-radius:50%;
+    background:var(--brand);border:3px solid #fff;box-shadow:0 0 0 2px var(--brand);
+  }
+  .tl-time{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px}
+  .tl-card{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px;cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+  }
+  .tl-card:active{transform:scale(.98)}
+  .tl-card .name{font-size:15px;font-weight:700;color:#111}
+  .tl-card .cat{font-size:11px;color:var(--muted);margin-top:2px}
+  .tl-card .note{font-size:12px;color:#555;margin-top:6px;line-height:1.5}
+  .tl-card .metrics{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+
+  /* ===== 5. 장소 상세 (모달 스타일) ===== */
+  .detail{background:#fff}
+  .dt-hero{
+    height:200px;background:linear-gradient(135deg,#FFC72C,#FF9500);
+    position:relative;display:flex;align-items:flex-end;padding:16px;color:#fff;flex-shrink:0;
+  }
+  .dt-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 60%)}
+  .dt-hero .back-btn{position:absolute;top:14px;left:14px;background:#fff;color:#111;z-index:3}
+  .dt-hero .title-box{position:relative;z-index:2}
+  .dt-hero h3{font-size:22px;font-weight:800;color:#fff}
+  .dt-hero .loc{font-size:12px;margin-top:4px;opacity:.95}
+
+  .dt-body{padding:18px;flex:1;overflow-y:auto}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .metric .lbl{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .metric .num{font-size:22px;font-weight:800;margin-top:6px}
+  .metric.green .num{color:var(--green)}
+  .metric.red .num{color:var(--red)}
+  .metric .sub{font-size:10.5px;color:#999;margin-top:2px}
+  .bar-mini{height:5px;background:#F0F0F0;border-radius:3px;margin-top:8px;overflow:hidden}
+  .bar-mini .fill{height:100%}
+
+  .book-bar{
+    border-top:1px solid var(--line);padding:14px 18px 22px 18px;display:flex;gap:10px;align-items:center;background:#fff;flex-shrink:0
+  }
+
+  /* ===== 설정/API 화면 ===== */
+  .settings{padding:14px 22px 22px 22px}
+  .settings .row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+  .settings .row label{font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px;text-transform:uppercase}
+  .settings .row input{width:100%;padding:10px 0;border:none;outline:none;font-size:14px;font-family:inherit;background:transparent}
+  .settings-note{background:var(--brand-bg);border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.55;color:#5b4a00;margin-bottom:16px}
+  .mode-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:14px}
+  .mode-badge.demo{background:#EFEFEF;color:#555}
+  .mode-badge.live{background:#E5F5EC;color:var(--green)}
+
+  /* ===== 에러 ===== */
+  .err{background:#FDECEC;color:#7a1e1e;padding:12px 14px;border-radius:10px;font-size:12.5px;margin-top:14px;display:none}
+  .err.on{display:block}
+
+  /* ===== 유틸 ===== */
+  .hidden{display:none !important}
+  .center{text-align:center}
+</style>
+</head>
+<body>
+
+<div class="stage">
+<div class="phone">
+
+  <!-- ============== 1. SPLASH ============== -->
+  <div class="view active splash" id="view-splash">
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="splash-center">
+      <div class="splash-logo">3초 여행</div>
+      <div class="splash-sub">진짜 현지 경험을<br/>30초 안에 완성형 일정으로</div>
+      <div class="splash-tags">
+        <span class="t">🧭 현지인 데이터</span>
+        <span class="t">⏱️ 실측 이동시간</span>
+        <span class="t">🤖 AI 자동 생성</span>
+      </div>
+    </div>
+    <div class="cta">
+      <button class="btn btn-dark" onclick="go('input')">시작하기 →</button>
+      <div class="cta-sub"><a href="#" onclick="go('settings');return false">⚙️ OpenAI API 키 설정</a></div>
+    </div>
+  </div>
+
+  <!-- ============== 2. INPUT ============== -->
+  <div class="view" id="view-input">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('splash')">←</button>
+      <div class="step-dots"><div class="d on"></div><div class="d on"></div><div class="d on"></div><div class="d on"></div></div>
+    </div>
+    <div class="view-scroll">
+      <div class="form-wrap">
+        <h2 class="h-title">어떤 여행을<br/>준비하고 계세요?</h2>
+        <p class="h-sub">입력만 하면 AI가 현지인 데이터로 일정을 완성합니다</p>
+
+        <div class="field">
+          <div class="field-label">🌏 목적지</div>
+          <div class="dest-grid" id="destGrid"></div>
+          <input class="dest-custom" id="destCustom" placeholder="또는 직접 입력 (예: 오사카, 일본)" />
+        </div>
+
+        <div class="field">
+          <div class="field-label">📅 여행 일정</div>
+          <div class="date-row">
+            <input type="date" class="date-input" id="dateStart" />
+            <input type="date" class="date-input" id="dateEnd" />
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px" id="dateInfo">일정을 선택하세요</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">💰 예산 (1인)</div>
+          <div class="budget-box">
+            <div style="font-size:11px;color:#999">총 예산 (항공 포함)</div>
+            <div class="budget-amt" id="budgetAmt">₩ 1,200,000</div>
+            <div class="slider-wrap">
+              <input type="range" class="slider" id="budgetSlider" min="30" max="500" value="120" step="10"/>
+              <div class="budget-ticks"><span>₩30만</span><span>₩150만</span><span>₩500만</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">✨ 여행 스타일 (복수 선택)</div>
+          <div class="chip-grid" id="styleGrid"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">👥 동행</div>
+          <div class="comp-grid" id="compGrid"></div>
+        </div>
+
+        <div class="err" id="formErr"></div>
+      </div>
+    </div>
+    <div class="footer-cta">
+      <div class="mode-badge" id="modeBadge">🎭 데모 모드 (API 키 없음)</div>
+      <button class="btn btn-primary" onclick="submitForm()">AI 일정 생성하기 →</button>
+    </div>
+  </div>
+
+  <!-- ============== 3. LOADING ============== -->
+  <div class="view" id="view-loading">
+    <div class="loading" style="flex:1">
+      <div class="timer"><div class="timer-num" id="timerNum">3</div><div class="timer-lbl">초 남았어요</div></div>
+      <div class="loading-title" id="loadingTitle">현지인이 가는 곳만<br/>골라내는 중...</div>
+      <div class="loading-sub">Foursquare Local Ratio · Google Maps 실측 이동시간</div>
+      <div class="ls-list" id="lsList">
+        <div class="ls doing" data-i="0"><div class="dot"></div>입력값 분석 중...</div>
+        <div class="ls idle" data-i="1"><div class="dot"></div>현지인 방문 비율 필터링</div>
+        <div class="ls idle" data-i="2"><div class="dot"></div>이동시간 실측 계산</div>
+        <div class="ls idle" data-i="3"><div class="dot"></div>AI 일정 최적화</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== 4. RESULT ============== -->
+  <div class="view" id="view-result">
+    <div class="result-head">
+      <div class="rh-top">
+        <button class="iconbtn" onclick="go('input')">←</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="iconbtn" onclick="regenerate()" title="재생성">↻</button>
+          <button class="iconbtn" onclick="saveTrip()" title="저장">♡</button>
+        </div>
+      </div>
+      <h2 id="resTitle">여행 일정</h2>
+      <div class="sub" id="resSub">-</div>
+      <div class="result-stats">
+        <div class="rs"><div class="lbl">장소</div><div class="val" id="stPlaces">-</div></div>
+        <div class="rs"><div class="lbl">현지인 %</div><div class="val" id="stLocal">-</div></div>
+        <div class="rs"><div class="lbl">일수</div><div class="val" id="stDays">-</div></div>
+      </div>
+    </div>
+    <div class="day-tabs" id="dayTabs"></div>
+    <div class="view-scroll" id="dayContent"></div>
+    <div class="footer-cta">
+      <button class="btn btn-dark" onclick="go('booking')">예약하러 가기</button>
+    </div>
+  </div>
+
+  <!-- ============== 5. DETAIL ============== -->
+  <div class="view detail" id="view-detail">
+    <div class="dt-hero">
+      <button class="iconbtn back-btn" onclick="go('result')">←</button>
+      <div class="title-box">
+        <span class="pill brand" id="dtBadge">로컬 추천</span>
+        <h3 id="dtName">-</h3>
+        <div class="loc" id="dtLoc">-</div>
+      </div>
+    </div>
+    <div class="dt-body">
+      <div style="font-size:13px;color:#333;line-height:1.6;margin-bottom:16px" id="dtDesc"></div>
+      <div class="metric-grid">
+        <div class="metric green">
+          <div class="lbl">현지인 방문 비율</div>
+          <div class="num" id="dtLocal">-</div>
+          <div class="sub">Foursquare Local Ratio</div>
+          <div class="bar-mini"><div class="fill" id="dtLocalBar" style="background:var(--green);width:0%"></div></div>
+        </div>
+        <div class="metric red">
+          <div class="lbl">혼잡도 / 대기</div>
+          <div class="num" id="dtCrowd">-</div>
+          <div class="sub" id="dtCrowdSub">-</div>
+        </div>
+        <div class="metric">
+          <div class="lbl">추천 시간</div>
+          <div class="num" style="font-size:15px" id="dtTime">-</div>
+        </div>
+        <div class="metric">
+          <div class="lbl">카테고리</div>
+          <div class="num" style="font-size:15px" id="dtCat">-</div>
+        </div>
+      </div>
+    </div>
+    <div class="book-bar">
+      <button class="btn btn-ghost" onclick="openMap()" style="flex:1">🗺️ 구글 맵</button>
+      <button class="btn btn-primary" onclick="openBooking()" style="flex:1.2">예약하기</button>
+    </div>
+  </div>
+
+  <!-- ============== 6. BOOKING ============== -->
+  <div class="view" id="view-booking">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('result')">←</button>
+      <div class="title">예약 연동</div>
+    </div>
+    <div class="view-scroll" style="padding:6px 22px 22px 22px">
+      <h2 class="h-title">일정이 확정되었어요</h2>
+      <p class="h-sub">한 번에 전부 예약하면 계획 → 실행이 10배 빨라집니다</p>
+
+      <div style="margin-top:20px;background:#FFFBEA;border-radius:14px;padding:16px;border:1.5px dashed var(--brand)">
+        <div style="font-size:11px;color:#8B5E00;font-weight:700">예상 TOTAL</div>
+        <div style="font-size:28px;font-weight:800;margin-top:4px" id="bkTotal">₩ 842,300</div>
+        <div style="font-size:11px;color:#8B5E00;margin-top:4px">숙소 + 교통 + 액티비티 패키지</div>
+      </div>
+
+      <div style="margin-top:18px" id="bookingList"></div>
+    </div>
+    <div class="footer-cta">
+      <button class="btn btn-primary" onclick="alert('실제 앱에서는 파트너 API로 일괄 결제 연동됩니다.')">모두 한 번에 예약</button>
+    </div>
+  </div>
+
+  <!-- ============== 7. SETTINGS ============== -->
+  <div class="view" id="view-settings">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('splash')">←</button>
+      <div class="title">설정</div>
+    </div>
+    <div class="view-scroll">
+      <div class="settings">
+        <div class="settings-note">
+          <b>🔑 OpenAI API 키를 입력하면 실제 GPT-4o가 일정을 생성합니다.</b><br/>
+          키는 이 페이지 메모리에만 저장되며 새로고침하면 지워집니다.
+          키가 없어도 <b>데모 모드</b>로 전체 플로우를 체험할 수 있어요.
+        </div>
+        <div class="row">
+          <label>OpenAI API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="sk-..." />
+        </div>
+        <div class="row">
+          <label>모델</label>
+          <input type="text" id="modelInput" value="gpt-4o-mini" />
+        </div>
+        <div class="err" id="setErr"></div>
+        <button class="btn btn-dark" onclick="saveKey()" style="margin-top:16px">저장하고 돌아가기</button>
+        <button class="btn btn-ghost" onclick="clearKey()" style="margin-top:8px">키 삭제 (데모 모드)</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+<script>
+/* ============================================================
+   3 Second Trip - Functional MVP
+   ============================================================ */
+
+/* ---------- State ---------- */
+const state = {
+  apiKey: "",
+  model: "gpt-4o-mini",
+  destination: "도쿄, 일본",
+  startDate: "",
+  endDate: "",
+  budget: 120, // 만원
+  styles: ["힐링","미식"],
+  companion: "커플",
+  generated: null,
+  activeDay: 0,
+  activeActivity: null,
+};
+
+/* ---------- Navigation ---------- */
+const history = ["splash"];
+function go(id){
+  const cur = document.querySelector(".view.active");
+  const next = document.getElementById("view-"+id);
+  if(!next || cur===next) return;
+  if(cur) cur.classList.remove("active");
+  next.classList.add("active");
+  if(history[history.length-1] !== id) history.push(id);
+}
+
+/* ---------- 목적지 프리셋 ---------- */
+const DEST_PRESETS = [
+  { flag:"🇯🇵", name:"도쿄, 일본", sub:"현지인 데이터 풍부" },
+  { flag:"🇯🇵", name:"오사카, 일본", sub:"미식 여행 Best" },
+  { flag:"🇹🇭", name:"방콕, 태국", sub:"숨은 로컬 맛집" },
+  { flag:"🇻🇳", name:"다낭, 베트남", sub:"힐링 휴양" },
+  { flag:"🇹🇼", name:"타이베이, 대만", sub:"야시장 로컬" },
+  { flag:"🇰🇷", name:"서울, 한국", sub:"국내 여행" },
+];
+const STYLES = [
+  {emj:"🌿", lb:"힐링"},{emj:"🍜", lb:"미식"},{emj:"🛍️", lb:"쇼핑"},
+  {emj:"🏞️", lb:"액티비티"},{emj:"📷", lb:"사진"},{emj:"🎨", lb:"문화"},
+];
+const COMPS = ["혼자","커플","가족","친구"];
+
+/* ---------- Init UI ---------- */
+function initUI(){
+  // 목적지
+  const dg = document.getElementById("destGrid");
+  dg.innerHTML = "";
+  DEST_PRESETS.forEach(d=>{
+    const el = document.createElement("div");
+    el.className = "dest-card" + (d.name===state.destination?" on":"");
+    el.innerHTML = `<div class="flag">${d.flag}</div><div><div class="nm">${d.name}</div><div class="sub">${d.sub}</div></div>`;
+    el.onclick = ()=>{
+      state.destination = d.name;
+      document.getElementById("destCustom").value = "";
+      initUI();
+    };
+    dg.appendChild(el);
+  });
+  document.getElementById("destCustom").oninput = (e)=>{
+    if(e.target.value.trim()) {
+      state.destination = e.target.value.trim();
+      // 프리셋 선택 해제
+      document.querySelectorAll("#destGrid .dest-card").forEach(c=>c.classList.remove("on"));
+    }
+  };
+
+  // 스타일
+  const sg = document.getElementById("styleGrid");
+  sg.innerHTML = "";
+  STYLES.forEach(s=>{
+    const el = document.createElement("div");
+    el.className = "chip-card" + (state.styles.includes(s.lb)?" on":"");
+    el.innerHTML = `<div class="emj">${s.emj}</div><div class="lb">${s.lb}</div>`;
+    el.onclick = ()=>{
+      if(state.styles.includes(s.lb)) state.styles = state.styles.filter(x=>x!==s.lb);
+      else state.styles.push(s.lb);
+      initUI();
+    };
+    sg.appendChild(el);
+  });
+
+  // 동행
+  const cg = document.getElementById("compGrid");
+  cg.innerHTML = "";
+  COMPS.forEach(c=>{
+    const el = document.createElement("div");
+    el.className = "comp-chip" + (state.companion===c?" on":"");
+    el.textContent = c;
+    el.onclick = ()=>{ state.companion = c; initUI(); };
+    cg.appendChild(el);
+  });
+
+  // 예산
+  document.getElementById("budgetAmt").textContent =
+    "₩ " + (state.budget*10000).toLocaleString();
+
+  // 날짜 기본값
+  if(!state.startDate){
+    const today = new Date(); today.setDate(today.getDate()+14);
+    const end = new Date(today); end.setDate(end.getDate()+2);
+    state.startDate = today.toISOString().slice(0,10);
+    state.endDate = end.toISOString().slice(0,10);
+  }
+  document.getElementById("dateStart").value = state.startDate;
+  document.getElementById("dateEnd").value = state.endDate;
+  updateDateInfo();
+
+  // 모드 뱃지
+  const badge = document.getElementById("modeBadge");
+  if(state.apiKey){
+    badge.className = "mode-badge live";
+    badge.textContent = "🟢 LIVE 모드 · 실제 GPT 호출";
+  } else {
+    badge.className = "mode-badge demo";
+    badge.textContent = "🎭 데모 모드 · API 키 없음 (설정에서 추가)";
+  }
+}
+
+function updateDateInfo(){
+  const s = new Date(state.startDate), e = new Date(state.endDate);
+  const days = Math.max(1, Math.round((e-s)/(1000*60*60*24))+1);
+  document.getElementById("dateInfo").textContent = `총 ${days-1}박 ${days}일`;
+}
+
+/* ---------- 이벤트 바인딩 ---------- */
+document.getElementById("budgetSlider").oninput = (e)=>{
+  state.budget = parseInt(e.target.value);
+  document.getElementById("budgetAmt").textContent =
+    "₩ " + (state.budget*10000).toLocaleString();
+};
+document.getElementById("dateStart").onchange = (e)=>{ state.startDate = e.target.value; updateDateInfo(); };
+document.getElementById("dateEnd").onchange = (e)=>{ state.endDate = e.target.value; updateDateInfo(); };
+
+/* ---------- 폼 제출 ---------- */
+async function submitForm(){
+  const err = document.getElementById("formErr");
+  err.classList.remove("on");
+  const custom = document.getElementById("destCustom").value.trim();
+  if(custom) state.destination = custom;
+  if(!state.destination){ err.textContent = "목적지를 선택하거나 입력해주세요."; err.classList.add("on"); return; }
+  if(state.styles.length===0){ err.textContent = "여행 스타일을 하나 이상 선택해주세요."; err.classList.add("on"); return; }
+  const s = new Date(state.startDate), e2 = new Date(state.endDate);
+  if(e2 < s){ err.textContent = "도착일이 출발일보다 빨라요."; err.classList.add("on"); return; }
+
+  go("loading");
+  await runLoading();
+}
+
+/* ---------- 로딩 애니메이션 + API 호출 ---------- */
+async function runLoading(){
+  const items = document.querySelectorAll("#lsList .ls");
+  items.forEach(i=>i.className="ls idle");
+  items[0].className = "ls doing";
+  document.getElementById("timerNum").textContent = "3";
+
+  // 타이머
+  let t = 3;
+  const timer = setInterval(()=>{
+    t -= 0.1;
+    if(t<0) t = 0;
+    document.getElementById("timerNum").textContent = t.toFixed(1).replace(/\.0$/,"");
+  }, 100);
+
+  // 단계 진행
+  for(let i=0;i<items.length;i++){
+    await sleep(600);
+    if(i>0) items[i-1].className = "ls done";
+    if(i<items.length) items[i].className = "ls doing";
+  }
+
+  // 실제 생성
+  try {
+    const data = state.apiKey ? await callGPT() : getDemoData();
+    state.generated = data;
+    clearInterval(timer);
+    document.querySelectorAll("#lsList .ls").forEach(i=>i.className="ls done");
+    await sleep(300);
+    renderResult();
+    go("result");
+  } catch(e){
+    clearInterval(timer);
+    alert("생성 실패: " + e.message + "\n데모 모드로 전환합니다.");
+    state.generated = getDemoData();
+    renderResult();
+    go("result");
+  }
+}
+const sleep = (ms)=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- GPT 호출 ---------- */
+async function callGPT(){
+  const s = new Date(state.startDate), e = new Date(state.endDate);
+  const nights = Math.max(1, Math.round((e-s)/(1000*60*60*24)));
+
+  const prompt = `당신은 "3 Second Trip"의 AI 여행 플래너입니다.
+아래 조건으로 최적 여행 일정을 JSON으로만 반환하세요. 다른 설명, 마크다운 금지.
+
+[조건]
+- 목적지: ${state.destination}
+- 기간: ${nights}박 ${nights+1}일 (${state.startDate} ~ ${state.endDate})
+- 예산(1인): ${state.budget}만원
+- 동행: ${state.companion}
+- 스타일: ${state.styles.join(", ")}
+
+[규칙]
+1. 현지인 방문 비율 높은 장소(0.7+) 우선, 관광객 밀집 명소 제외
+2. 첫날/마지막날은 비행·공항 이동·입국심사·체크아웃 시간 반드시 반영
+3. 각 장소마다 "local_ratio"(0~1), "crowd"("low"/"mid"/"high") 명시
+4. 이동은 "transit" 필드에 mode와 duration 포함
+
+[JSON 스키마]
+{
+  "trip_title": "짧은 제목",
+  "summary": "한 줄 요약",
+  "total_estimate_krw": 숫자,
+  "days": [{
+    "day": 1,
+    "label": "Day 1 (도착일)",
+    "activities": [{
+      "time": "HH:MM",
+      "name": "장소명(현지어 병기)",
+      "category": "카테고리",
+      "description": "20자 설명",
+      "local_ratio": 0.85,
+      "crowd": "low",
+      "crowd_note": "웨이팅 15분",
+      "transit_from_prev": { "mode":"지하철", "duration_min": 15, "cost": "¥210" }
+    }]
+  }]
+}`;
+
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "Authorization":`Bearer ${state.apiKey}` },
+    body: JSON.stringify({
+      model: state.model || "gpt-4o-mini",
+      messages: [
+        { role:"system", content:"Return only valid JSON." },
+        { role:"user", content: prompt }
+      ],
+      temperature: 0.7,
+      response_format: { type:"json_object" }
+    })
+  });
+  if(!res.ok) throw new Error(`OpenAI ${res.status}: ${(await res.text()).slice(0,120)}`);
+  const j = await res.json();
+  return JSON.parse(j.choices[0].message.content);
+}
+
+/* ---------- 데모 데이터 (목적지별) ---------- */
+function getDemoData(){
+  const dest = state.destination;
+  const s = new Date(state.startDate), e = new Date(state.endDate);
+  const nights = Math.max(1, Math.round((e-s)/(1000*60*60*24)));
+  const dayCount = nights+1;
+
+  // 베이스 장소 DB
+  const DB = {
+    "도쿄": [
+      {name:"Trunk Hotel Shibuya",cat:"숙소",desc:"부티크 호텔 · 시부야 감성",local:0.82,crowd:"low"},
+      {name:"もつ焼きでん (모츠야키 덴)",cat:"이자카야",desc:"시부야 현지 직장인 단골",local:0.91,crowd:"high",note:"웨이팅 25분"},
+      {name:"메구로강 산책로",cat:"야경",desc:"조용한 현지 코스",local:0.88,crowd:"low"},
+      {name:"야나카긴자 상점가",cat:"로컬",desc:"서민 감성 골목",local:0.93,crowd:"mid"},
+      {name:"Blue Bottle 키요스미",cat:"카페",desc:"1호점 스페셜티",local:0.74,crowd:"mid"},
+      {name:"시모키타자와 빈티지",cat:"쇼핑",desc:"MZ 감성 골목",local:0.85,crowd:"mid"},
+      {name:"스시 이사오",cat:"스시",desc:"현지인 점심 맛집",local:0.87,crowd:"mid",note:"웨이팅 15분"},
+      {name:"하마리큐 정원",cat:"힐링",desc:"도심 속 조용한 정원",local:0.79,crowd:"low"},
+      {name:"츠키지 외장시장",cat:"시장",desc:"아침 활기",local:0.81,crowd:"high"},
+    ],
+    "오사카": [
+      {name:"Hotel She Osaka",cat:"숙소",desc:"부두 뷰 부티크",local:0.78,crowd:"low"},
+      {name:"타코야키 와나카 본점",cat:"길거리",desc:"진짜 오사카 타코야키",local:0.92,crowd:"high",note:"웨이팅 20분"},
+      {name:"호젠지 요코초",cat:"이자카야",desc:"골목 현지 술집",local:0.89,crowd:"mid"},
+      {name:"우메다 공중정원",cat:"야경",desc:"석양 뷰 포인트",local:0.71,crowd:"mid"},
+      {name:"쿠로몬 시장",cat:"시장",desc:"아침 현지 주방",local:0.83,crowd:"mid"},
+    ],
+    "방콕": [
+      {name:"Ari 로컬 카페거리",cat:"카페",desc:"현지 감성 동네",local:0.88,crowd:"low"},
+      {name:"Jay Fai",cat:"미슐랭 길거리",desc:"게 오믈렛 전설",local:0.76,crowd:"high",note:"웨이팅 1시간"},
+      {name:"창추이 마켓",cat:"로컬",desc:"주말 야시장",local:0.91,crowd:"mid"},
+      {name:"왓 아룬 야경",cat:"야경",desc:"강 건너편 뷰",local:0.68,crowd:"mid"},
+    ],
+    "다낭": [
+      {name:"미케 비치 산책",cat:"힐링",desc:"현지 아침 수영",local:0.85,crowd:"low"},
+      {name:"반미 피",cat:"현지식",desc:"숨은 반미 맛집",local:0.94,crowd:"mid"},
+      {name:"손트라 반도",cat:"드라이브",desc:"절벽 해안도로",local:0.72,crowd:"low"},
+      {name:"바나힐 vs 로컬 마을",cat:"문화",desc:"관광객 피한 루트",local:0.80,crowd:"low"},
+    ],
+    "타이베이": [
+      {name:"Fujin Street",cat:"카페",desc:"현지 감성 골목",local:0.89,crowd:"low"},
+      {name:"Raohe 야시장",cat:"시장",desc:"현지인 저녁",local:0.91,crowd:"high"},
+      {name:"우라이 온천",cat:"힐링",desc:"원주민 마을",local:0.77,crowd:"low"},
+    ],
+    "서울": [
+      {name:"익선동 한옥 골목",cat:"로컬",desc:"감성 카페골목",local:0.78,crowd:"mid"},
+      {name:"망원시장 먹자",cat:"시장",desc:"현지인 저녁",local:0.86,crowd:"mid"},
+      {name:"서촌 백년가옥",cat:"문화",desc:"조용한 한옥 산책",local:0.82,crowd:"low"},
+    ]
+  };
+
+  let city = Object.keys(DB).find(k => dest.includes(k)) || "도쿄";
+  const pool = DB[city];
+  const transits = [
+    {mode:"지하철",duration_min:15,cost:"¥210"},
+    {mode:"도보",duration_min:8,cost:"무료"},
+    {mode:"택시",duration_min:12,cost:"¥1,400"},
+    {mode:"버스",duration_min:22,cost:"¥240"},
+  ];
+
+  const days = [];
+  for(let d=0; d<dayCount; d++){
+    const isFirst = d===0;
+    const isLast = d===dayCount-1 && dayCount>1;
+    const activities = [];
+
+    if(isFirst && city!=="서울"){
+      activities.push({
+        time:"13:20", name:"공항 도착 · 입국심사",
+        category:"공항", description:"심사 대기 40분 반영",
+        local_ratio:0, crowd:"mid", crowd_note:"",
+        transit_from_prev:null
+      });
+      activities.push({
+        time:"14:40", name:"공항철도 탑승",
+        category:"이동", description:`공항 → ${city} 시내`,
+        local_ratio:0, crowd:"mid",
+        transit_from_prev:{mode:"특급열차", duration_min:83, cost:"¥3,070"}
+      });
+    } else if(isFirst){
+      activities.push({
+        time:"09:00", name:"여행 시작",
+        category:"출발", description:"",
+        local_ratio:0, crowd:"low"
+      });
+    }
+
+    const baseTimes = isFirst ? ["16:00","18:30","21:00"] : (isLast ? ["09:00","11:30","13:30"] : ["09:30","12:00","15:00","18:30","20:30"]);
+    baseTimes.forEach((t, idx)=>{
+      const p = pool[(d*3 + idx) % pool.length];
+      activities.push({
+        time:t, name:p.name, category:p.cat, description:p.desc,
+        local_ratio:p.local, crowd:p.crowd, crowd_note:p.note||"",
+        transit_from_prev: idx>0 ? transits[(d+idx)%transits.length] : null
+      });
+    });
+
+    if(isLast && city!=="서울"){
+      activities.push({
+        time:"15:00", name:"공항 이동 시작",
+        category:"이동", description:"출발 3시간 전 기준 역산",
+        local_ratio:0, crowd:"mid",
+        transit_from_prev:{mode:"특급열차", duration_min:83, cost:"¥3,070"}
+      });
+    }
+
+    days.push({
+      day: d+1,
+      label: `Day ${d+1}${isFirst?" (도착일)":isLast?" (출국일)":""}`,
+      activities
+    });
+  }
+
+  const totalPlaces = days.reduce((sum,d)=>sum+d.activities.filter(a=>a.local_ratio>0).length, 0);
+  const avgLocal = days.reduce((sum,d)=>{
+    const valid = d.activities.filter(a=>a.local_ratio>0);
+    return sum + valid.reduce((s,a)=>s+a.local_ratio,0);
+  },0) / Math.max(1,totalPlaces);
+
+  return {
+    trip_title: `${dest} ${nights}박 ${nights+1}일 · 현지 감성 ${state.styles.join("+")} 여행`,
+    summary: `${state.companion} · ${state.styles.join(", ")} · 현지인 데이터 기반`,
+    total_estimate_krw: state.budget * 10000 * 0.7,
+    avg_local_ratio: avgLocal,
+    total_places: totalPlaces,
+    days
+  };
+}
+
+/* ---------- 결과 렌더링 ---------- */
+function renderResult(){
+  const g = state.generated;
+  document.getElementById("resTitle").textContent = g.trip_title || "여행 일정";
+  document.getElementById("resSub").textContent = g.summary || `${state.companion} · ${state.styles.join(", ")}`;
+
+  let totalPlaces = 0, localSum = 0, localCount = 0;
+  g.days.forEach(d=>{
+    d.activities.forEach(a=>{
+      if(a.local_ratio>0){ totalPlaces++; localSum += a.local_ratio; localCount++; }
+    });
+  });
+  document.getElementById("stPlaces").textContent = totalPlaces + "곳";
+  document.getElementById("stLocal").textContent = Math.round((localSum/Math.max(1,localCount))*100) + "%";
+  document.getElementById("stDays").textContent = g.days.length + "일";
+
+  // 탭
+  const tabs = document.getElementById("dayTabs");
+  tabs.innerHTML = "";
+  g.days.forEach((d,i)=>{
+    const btn = document.createElement("button");
+    btn.className = "day-tab" + (i===state.activeDay?" on":"");
+    btn.textContent = d.label || `Day ${d.day}`;
+    btn.onclick = ()=>{ state.activeDay = i; renderResult(); };
+    tabs.appendChild(btn);
+  });
+
+  renderDay(g.days[state.activeDay]);
+  renderBooking();
+}
+
+function renderDay(day){
+  const host = document.getElementById("dayContent");
+  host.innerHTML = `<div class="timeline" id="tl"></div>`;
+  const tl = document.getElementById("tl");
+
+  day.activities.forEach((a, idx)=>{
+    const item = document.createElement("div");
+    item.className = "tl-item";
+
+    const crowdPill = a.crowd==="low" ? `<span class="pill green">혼잡도 낮음</span>`
+      : a.crowd==="mid" ? `<span class="pill orange">혼잡 보통</span>`
+      : a.crowd==="high" ? `<span class="pill red">혼잡 높음</span>` : "";
+    const localPill = a.local_ratio>0 ? `<span class="pill green">현지인 ${Math.round(a.local_ratio*100)}%</span>` : "";
+    const noteBox = a.crowd_note ? `<span class="pill red">${a.crowd_note}</span>` : "";
+
+    item.innerHTML = `
+      <div class="tl-time">${a.time || ""}</div>
+      <div class="tl-card" data-idx="${idx}">
+        <div class="name">${a.name}</div>
+        <div class="cat">${a.category || ""}</div>
+        ${a.description ? `<div class="note">${a.description}</div>` : ""}
+        <div class="metrics">${localPill} ${crowdPill} ${noteBox}</div>
+      </div>
+    `;
+    tl.appendChild(item);
+    item.querySelector(".tl-card").onclick = ()=>openDetail(a);
+  });
+}
+
+/* ---------- 장소 상세 ---------- */
+function openDetail(a){
+  state.activeActivity = a;
+  document.getElementById("dtName").textContent = a.name || "-";
+  document.getElementById("dtLoc").textContent = `📍 ${state.destination} · ${a.category || ""}`;
+  document.getElementById("dtDesc").textContent = a.description || "";
+
+  const badge = document.getElementById("dtBadge");
+  if(a.local_ratio >= 0.85){ badge.textContent = "🏆 숨은 로컬 명소"; badge.className="pill brand"; }
+  else if(a.local_ratio >= 0.7){ badge.textContent = "👍 로컬 추천"; badge.className="pill green"; }
+  else { badge.textContent = "📍 일반"; badge.className="pill"; }
+
+  const localPct = Math.round((a.local_ratio||0)*100);
+  document.getElementById("dtLocal").textContent = localPct + "%";
+  document.getElementById("dtLocalBar").style.width = localPct + "%";
+  document.getElementById("dtCrowd").textContent =
+    a.crowd==="low"?"낮음":a.crowd==="mid"?"보통":a.crowd==="high"?"높음":"-";
+  document.getElementById("dtCrowdSub").textContent = a.crowd_note || "실시간 데이터";
+  document.getElementById("dtTime").textContent = a.time || "-";
+  document.getElementById("dtCat").textContent = a.category || "-";
+  go("detail");
+}
+
+function openMap(){
+  const q = encodeURIComponent((state.activeActivity?.name || state.destination) + " " + state.destination);
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, "_blank");
+}
+function openBooking(){
+  const q = encodeURIComponent(state.activeActivity?.name || state.destination);
+  window.open(`https://www.yanolja.com/search?keyword=${q}`, "_blank");
+}
+
+/* ---------- 예약 화면 ---------- */
+function renderBooking(){
+  const g = state.generated;
+  const total = Math.round((g.total_estimate_krw || state.budget*10000*0.7));
+  document.getElementById("bkTotal").textContent = "₩ " + total.toLocaleString();
+
+  const items = [
+    {icon:"야놀자",bg:"#3B5BDB",name:`${state.destination} 숙소 ${g.days.length-1}박`,sub:"현지인 추천 부티크",price:Math.round(total*0.5),url:`https://www.yanolja.com/search?keyword=${encodeURIComponent(state.destination)}`},
+    {icon:"airbnb",bg:"#FF5A5F",name:"현지 에어비앤비",sub:"로컬 감성 숙소 대안",price:Math.round(total*0.3),url:`https://www.airbnb.co.kr/s/${encodeURIComponent(state.destination)}`},
+    {icon:"교통",bg:"#111",name:"교통 패스",sub:"공항 ↔ 시내 포함",price:Math.round(total*0.15),url:`https://www.klook.com/ko/search/result/?query=${encodeURIComponent(state.destination)}`},
+  ];
+  const host = document.getElementById("bookingList");
+  host.innerHTML = "";
+  items.forEach(it=>{
+    const el = document.createElement("div");
+    el.className = "tl-card";
+    el.style.marginBottom = "10px";
+    el.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:44px;height:44px;background:${it.bg};color:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:10px">${it.icon}</div>
+        <div style="flex:1">
+          <div class="name">${it.name}</div>
+          <div class="cat">${it.sub}</div>
+        </div>
+        <div style="font-weight:800;font-size:14px">₩ ${Math.round(it.price/1000)}K</div>
+      </div>
+      <button class="btn btn-ghost" style="margin-top:10px;padding:10px;font-size:12.5px">예약 링크로 이동 →</button>
+    `;
+    el.querySelector("button").onclick = ()=>window.open(it.url,"_blank");
+    host.appendChild(el);
+  });
+}
+
+/* ---------- 재생성/저장 ---------- */
+async function regenerate(){
+  go("loading");
+  await runLoading();
+}
+function saveTrip(){
+  alert("✓ 일정이 저장되었습니다! (MVP에서는 메모리에만 저장)");
+}
+
+/* ---------- 설정 ---------- */
+function saveKey(){
+  const k = document.getElementById("apiKeyInput").value.trim();
+  const m = document.getElementById("modelInput").value.trim();
+  const err = document.getElementById("setErr");
+  err.classList.remove("on");
+  if(k && !k.startsWith("sk-")){
+    err.textContent = "⚠️ OpenAI 키는 sk- 로 시작해야 합니다.";
+    err.classList.add("on"); return;
+  }
+  state.apiKey = k;
+  state.model = m || "gpt-4o-mini";
+  initUI();
+  go("splash");
+}
+function clearKey(){
+  document.getElementById("apiKeyInput").value = "";
+  state.apiKey = "";
+  initUI();
+}
+
+/* ---------- Boot ---------- */
+initUI();
+</script>
+</body>
+</html>
