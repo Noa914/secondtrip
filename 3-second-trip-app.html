@@ -332,7 +332,7 @@
 <div class="app" id="app">
 
   <!-- ============== 0. AUTH (로그인/회원가입) ============== -->
-  <div class="view active auth" id="view-auth">
+  <div class="view auth" id="view-auth">
     <div class="auth-wrap">
       <div class="auth-logo">3초 여행<span class="small">3 SECOND TRIP</span></div>
 
@@ -394,7 +394,7 @@
   </div>
 
   <!-- ============== 1. SPLASH ============== -->
-  <div class="view splash" id="view-splash">
+  <div class="view active splash" id="view-splash">
     <div class="bubble b1"></div>
     <div class="bubble b2"></div>
     <div class="bubble b3"></div>
@@ -415,7 +415,7 @@
       </div>
     </div>
     <div class="cta-block">
-      <button class="btn btn-dark" onclick="go('input')">시작하기 →</button>
+      <button class="btn btn-dark" onclick="go('auth')">시작하기 →</button>
       <div class="cta-sub"><a href="#" onclick="go('settings');return false">⚙️ OpenAI API 키 설정</a></div>
     </div>
   </div>
@@ -1435,6 +1435,169 @@ function go(id){
   if(t) t.classList.add("active");
 }
 
+/* ==================== AUTH (로그인/회원가입) ==================== */
+var authMode = "login"; // "login" | "signup"
+var currentUser = null;
+var USER_STORE_KEY = "tst_users_v1";
+var SESSION_KEY = "tst_session_v1";
+
+function _readUsers(){
+  try{ return JSON.parse(localStorage.getItem(USER_STORE_KEY)||"{}"); }catch(e){ return {}; }
+}
+function _writeUsers(u){
+  try{ localStorage.setItem(USER_STORE_KEY, JSON.stringify(u)); }catch(e){}
+}
+function _hashPw(s){
+  // simple non-crypto hash just to avoid raw plaintext (not secure, demo only)
+  var h = 2166136261>>>0;
+  for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619)>>>0; }
+  return h.toString(16);
+}
+function _validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function switchAuth(mode){
+  authMode = mode;
+  document.getElementById("tabLogin").classList.toggle("on", mode==="login");
+  document.getElementById("tabSignup").classList.toggle("on", mode==="signup");
+  document.getElementById("fieldName").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("fieldPw2").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("checkRemember").style.display = (mode==="login")?"flex":"none";
+  document.getElementById("checkAgree").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("authSubmit").textContent = (mode==="signup")?"회원가입":"로그인";
+  document.getElementById("authTitle").textContent = (mode==="signup")?"3초 여행을 시작하세요":"다시 오신 걸 환영해요";
+  document.getElementById("authSub").textContent = (mode==="signup")?"이메일로 간단하게 가입하세요":"AI가 맞춤 일정을 완성해드릴게요";
+  document.getElementById("authFoot").innerHTML = (mode==="signup")
+    ? '이미 계정이 있으신가요? <a onclick="switchAuth(\'login\')">로그인</a>'
+    : '계정이 없으신가요? <a onclick="switchAuth(\'signup\')">회원가입</a>';
+  document.getElementById("authPw").setAttribute("autocomplete", mode==="signup"?"new-password":"current-password");
+  document.getElementById("authError").textContent = "";
+}
+
+function togglePw(){
+  var inp = document.getElementById("authPw");
+  var btn = document.querySelector(".pw-toggle");
+  if(inp.type === "password"){ inp.type = "text"; if(btn) btn.textContent = "숨김"; }
+  else { inp.type = "password"; if(btn) btn.textContent = "보기"; }
+}
+
+function submitAuth(ev){
+  if(ev && ev.preventDefault) ev.preventDefault();
+  var email = (document.getElementById("authEmail").value||"").trim().toLowerCase();
+  var pw    = document.getElementById("authPw").value||"";
+  var err   = document.getElementById("authError");
+  err.textContent = "";
+
+  if(!_validEmail(email)){ err.textContent = "올바른 이메일 주소를 입력해주세요."; return false; }
+  if(pw.length < 6){ err.textContent = "비밀번호는 6자 이상이어야 합니다."; return false; }
+
+  var users = _readUsers();
+
+  if(authMode === "signup"){
+    var name = (document.getElementById("authName").value||"").trim();
+    var pw2  = document.getElementById("authPw2").value||"";
+    var agreed = document.getElementById("authAgree").checked;
+    if(!name){ err.textContent = "이름(닉네임)을 입력해주세요."; return false; }
+    if(pw !== pw2){ err.textContent = "비밀번호가 일치하지 않습니다."; return false; }
+    if(!agreed){ err.textContent = "이용약관에 동의해주세요."; return false; }
+    if(users[email]){ err.textContent = "이미 가입된 이메일입니다. 로그인해주세요."; return false; }
+    users[email] = { email:email, name:name, pwh:_hashPw(pw), created: Date.now() };
+    _writeUsers(users);
+    _setSession({ email:email, name:name }, true);
+    err.textContent = "";
+    onAuthSuccess({ email:email, name:name });
+    return false;
+  } else {
+    var u = users[email];
+    if(!u || u.pwh !== _hashPw(pw)){ err.textContent = "이메일 또는 비밀번호가 올바르지 않습니다."; return false; }
+    var remember = document.getElementById("authRemember").checked;
+    _setSession({ email:u.email, name:u.name }, remember);
+    onAuthSuccess({ email:u.email, name:u.name });
+    return false;
+  }
+}
+
+function socialLogin(provider){
+  // Demo: create/login a social user stub
+  var stubEmail = provider + "_user@demo.tst";
+  var stubName  = provider==="google"?"Google 사용자":provider==="kakao"?"카카오 사용자":"Apple 사용자";
+  var users = _readUsers();
+  if(!users[stubEmail]) users[stubEmail] = { email:stubEmail, name:stubName, pwh:"", social:provider, created: Date.now() };
+  _writeUsers(users);
+  _setSession({ email:stubEmail, name:stubName, social:provider }, true);
+  onAuthSuccess({ email:stubEmail, name:stubName });
+}
+
+function skipAuth(){
+  currentUser = { email:"guest@local", name:"게스트", guest:true };
+  renderUserChip();
+  go("input");
+}
+
+function _setSession(u, remember){
+  try{
+    if(remember) localStorage.setItem(SESSION_KEY, JSON.stringify(u));
+    else sessionStorage.setItem(SESSION_KEY, JSON.stringify(u));
+  }catch(e){}
+  currentUser = u;
+}
+
+function _readSession(){
+  try{
+    var s = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+    return s ? JSON.parse(s) : null;
+  }catch(e){ return null; }
+}
+
+function onAuthSuccess(u){
+  currentUser = u;
+  renderUserChip();
+  go("input");
+}
+
+function renderUserChip(){
+  var chip = document.getElementById("userChip");
+  var av   = document.getElementById("userAvatar");
+  var gr   = document.getElementById("userGreeting");
+  var su   = document.getElementById("splashUser");
+  if(!chip) return;
+  if(currentUser && currentUser.name){
+    chip.style.display = "inline-flex";
+    av.textContent = currentUser.name.charAt(0).toUpperCase();
+    gr.textContent = currentUser.name + "님, 환영합니다";
+    if(su) su.style.display = currentUser.guest ? "none" : "flex";
+  } else {
+    chip.style.display = "none";
+    if(su) su.style.display = "none";
+  }
+}
+
+function logout(){
+  try{ localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }catch(e){}
+  currentUser = null;
+  renderUserChip();
+  // reset form
+  try{
+    document.getElementById("authEmail").value = "";
+    document.getElementById("authPw").value = "";
+    var n=document.getElementById("authName"); if(n) n.value="";
+    var p2=document.getElementById("authPw2"); if(p2) p2.value="";
+    document.getElementById("authError").textContent = "";
+    switchAuth("login");
+  }catch(e){}
+  go("splash");
+}
+
+function initAuth(){
+  // 첫 화면은 항상 스플래시. 세션이 있으면 유저 정보만 복원한다.
+  var s = _readSession();
+  if(s && s.email){
+    currentUser = s;
+    renderUserChip();
+  }
+  // 로그인 화면 초기 탭 상태
+  try{ switchAuth("login"); }catch(e){}
+}
+
 /* ==================== DATE HELPERS ==================== */
 function pad(n){ return n<10?"0"+n:""+n; }
 function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
@@ -2424,6 +2587,9 @@ function updateModeBadge(){
 
 /* ==================== INIT UI ==================== */
 function initUI(){
+  // 인증 상태 초기화 (세션 복원 or 로그인 화면 유지)
+  try{ initAuth(); }catch(e){}
+
   // 인기 여행지
   renderPopular();
 
