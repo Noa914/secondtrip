@@ -1,0 +1,2661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<meta name="theme-color" content="#86C58A"/>
+<title>3 Second Trip · Mint</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gamja+Flower&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    /* pastel mint */
+    --brand:#86C58A; --brand-2:#A7D7AB; --brand-soft:#CFEAD1; --brand-bg:#F2FBF3;
+    --peach:#F9C6B1; --peach-soft:#FCE0D2;
+    --butter:#F7E59C; --butter-soft:#FDF3C4;
+    --lilac:#C5B5E5; --lilac-soft:#E3DCF5;
+    --sky:#A8D5E6; --sky-soft:#E1F0F6;
+    --ink:#2F3E2F; --ink-2:#4A5A4A; --muted:#889688;
+    --line:#D8EAD9; --card:#FFFFFF;
+    --green:#4FA86B; --red:#E26A6A; --orange:#F0A035; --blue:#5AA9D9;
+    --shadow-pop: 0 6px 0 rgba(47,62,47,0.12);
+    --shadow: 0 12px 30px rgba(47,62,47,0.10);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+  html,body,input,button,textarea,select{font-family:'Gaegu','Gamja Flower','Nunito',-apple-system,sans-serif;letter-spacing:-.2px}
+  html,body{height:100%;overflow:hidden;color:var(--ink);background:var(--brand-bg);font-weight:400;font-size:17px}
+  .bold, b, strong{font-weight:700}
+
+  /* 전체화면 앱 */
+  .app{width:100vw;height:100vh;position:relative;overflow:hidden;background:var(--brand-bg)}
+
+  .view{
+    position:absolute;inset:0;display:flex;flex-direction:column;
+    transform:translateX(100%);transition:transform .35s cubic-bezier(.2,.8,.2,1);
+    background:var(--brand-bg);z-index:1;
+  }
+  .view.active{transform:translateX(0);z-index:2}
+  .view.prev{transform:translateX(-30%);z-index:1;filter:brightness(.85)}
+  .view-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+  .view-scroll::-webkit-scrollbar{width:0}
+
+  /* 공통 */
+  .topbar{display:flex;align-items:center;gap:10px;padding:16px 18px 10px 18px;flex-shrink:0;background:var(--brand-bg);z-index:5}
+  .iconbtn{width:44px;height:44px;border-radius:50%;background:#fff;border:2.5px solid var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink);box-shadow:0 3px 0 var(--ink);transition:transform .1s}
+  .iconbtn:active{transform:translate(0,3px);box-shadow:0 0 0 var(--ink)}
+  .topbar .title{font-size:19px;font-weight:700;flex:1;text-align:center;margin-right:44px;color:var(--ink);font-family:'Gaegu',cursive}
+
+  .btn{width:100%;padding:16px 18px;border-radius:22px;font-weight:700;font-size:20px;border:2.5px solid var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Gaegu',cursive;line-height:1;box-shadow:0 5px 0 var(--ink);transition:transform .12s, box-shadow .12s;color:var(--ink)}
+  .btn:active{transform:translate(0,5px);box-shadow:0 0 0 var(--ink)}
+  .btn:disabled{opacity:.5;cursor:not-allowed;box-shadow:0 5px 0 var(--ink)}
+  .btn-primary{background:var(--brand);color:#fff}
+  .btn-dark{background:var(--ink);color:#fff}
+  .btn-ghost{background:#fff;color:var(--ink)}
+
+  .pill{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:999px;font-size:14px;font-weight:700;background:#fff;color:var(--ink);border:2px solid var(--ink);font-family:'Nunito',sans-serif;line-height:1.3}
+  .pill.brand{background:var(--brand-soft);color:#2E6E3A}
+  .pill.green{background:var(--brand-soft);color:#2E6E3A}
+  .pill.red{background:var(--peach-soft);color:#B23A3A}
+  .pill.orange{background:var(--butter-soft);color:#8A5B00}
+  .pill.blue{background:var(--sky-soft);color:#2E6D8A}
+
+  .footer-cta{padding:14px 18px 24px 18px;background:var(--brand-bg);flex-shrink:0}
+
+  /* ===== 1. Splash (화면 꽉 채움) ===== */
+  .splash{background:var(--brand);padding:0;position:relative;overflow:hidden;justify-content:space-between}
+  .splash .bubble{position:absolute;border-radius:50%;background:#ffffff35;pointer-events:none}
+  .splash .b1{width:340px;height:340px;top:-100px;right:-100px}
+  .splash .b2{width:420px;height:420px;bottom:-160px;left:-160px}
+  .splash .b3{width:160px;height:160px;top:30%;left:-50px}
+  .splash-center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;position:relative;z-index:2;padding:40px 24px;gap:28px}
+  .splash-logo{font-size:72px;font-weight:800;letter-spacing:-2.5px;line-height:1.05;color:#111;text-align:center}
+  .splash-logo .small{display:block;font-size:20px;letter-spacing:0;font-weight:600;color:#2a2a2a;margin-top:14px}
+  .splash-sub{font-size:16px;line-height:1.6;color:#1a1a1a;text-align:center;font-weight:500;max-width:320px}
+  .splash-tags{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:340px}
+  .splash-tags .t{background:#111;color:var(--brand);padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap}
+  .splash .cta-block{position:relative;z-index:2;padding:0 24px 40px 24px;flex-shrink:0}
+  .splash .cta-sub{text-align:center;margin-top:16px;font-size:12.5px;color:#111;font-weight:600}
+  .splash .cta-sub a{color:#111;text-decoration:underline}
+
+  /* ===== 2. 입력 폼 ===== */
+  .form-wrap{padding:6px 22px 22px 22px}
+  .h-title{font-size:26px;font-weight:800;letter-spacing:-.5px;line-height:1.25}
+  .h-sub{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+  .field{margin-top:22px}
+  .field-label{font-size:12px;font-weight:700;color:#666;margin-bottom:10px;letter-spacing:.3px}
+
+  /* 목적지 검색 드롭다운 */
+  .dest-search{position:relative}
+  .dest-input-wrap{display:flex;align-items:center;gap:8px;padding:14px;border:1.5px solid #EEE;border-radius:14px;background:#fff;cursor:text}
+  .dest-input-wrap.focus{border-color:var(--brand)}
+  .dest-input-wrap .sel-flag{font-size:22px}
+  .dest-input-wrap input{flex:1;border:none;outline:none;font-size:15px;font-family:inherit;font-weight:600;background:transparent;color:#111;min-width:0}
+  .dest-input-wrap .sel-clear{color:#999;font-size:18px;cursor:pointer;padding:0 4px}
+  .dest-dropdown{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;background:#fff;
+    border:1px solid #EEE;border-radius:14px;box-shadow:0 12px 30px rgba(0,0,0,.12);
+    max-height:320px;overflow-y:auto;z-index:20;display:none;
+  }
+  .dest-dropdown.on{display:block}
+  .dest-item{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid #F5F5F5}
+  .dest-item:last-child{border-bottom:none}
+  .dest-item:hover{background:#FFFBEA}
+  .dest-item .flag{font-size:22px}
+  .dest-item .nm{font-size:14px;font-weight:700}
+  .dest-item .country{font-size:11px;color:var(--muted);margin-top:1px}
+  .dest-item .info{flex:1;min-width:0}
+  .dest-empty{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* 인기 여행지 */
+  .pop-title{font-size:12px;font-weight:700;color:#666;margin:18px 0 10px 0;display:flex;align-items:center;gap:6px}
+  .pop-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .pop-card{border:1.5px solid #EEE;border-radius:12px;padding:12px 6px;text-align:center;cursor:pointer;background:#fff;transition:all .15s}
+  .pop-card:active{transform:scale(.96)}
+  .pop-card.on{border-color:#111;background:var(--brand-bg)}
+  .pop-card .flg{font-size:28px;line-height:1}
+  .pop-card .cnm{font-size:13px;font-weight:700;margin-top:6px;color:#111}
+  .pop-card .ctr{font-size:10px;color:var(--muted);margin-top:2px}
+  .dest-empty{padding:20px;text-align:center;color:var(--muted);font-size:13px}
+
+  /* 날짜 필드 */
+  .date-row{display:flex;gap:10px}
+  .date-field{flex:1;padding:14px;border:1.5px solid #EEE;border-radius:12px;background:#fff;cursor:pointer}
+  .date-field.on{border-color:var(--brand)}
+  .date-field .lb{font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase}
+  .date-field .val{font-size:14px;font-weight:700;color:#111;margin-top:4px}
+  .date-field .val.placeholder{color:#999;font-weight:500}
+
+  /* 예산 박스 */
+  .budget-box{background:#111;border-radius:16px;padding:18px;color:#fff}
+  .budget-amt{font-size:28px;font-weight:800;color:var(--brand);margin-top:4px;line-height:1.15}
+  .budget-row{display:flex;align-items:center;gap:10px;margin-top:4px;flex-wrap:wrap}
+  .budget-row .budget-amt{margin-top:0}
+  .budget-tier{display:inline-flex;align-items:center;justify-content:center;font-size:13px;line-height:1;height:32px;padding:0 12px;border-radius:10px;font-weight:800;letter-spacing:-.2px;box-sizing:border-box}
+  .budget-tier.low{background:#E5F5EC;color:var(--green)}
+  .budget-tier.mid{background:#FFF1DB;color:var(--orange)}
+  .budget-tier.high{background:#E3ECFF;color:var(--blue)}
+  .budget-tier.lux{background:#F9E0F5;color:#8E24AA}
+  .slider-wrap{margin-top:14px}
+  .slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:#333;border-radius:3px;outline:none}
+  .slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:var(--brand);cursor:pointer;border:3px solid #fff}
+  .slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--brand);cursor:pointer;border:3px solid #fff}
+  .budget-ticks{display:flex;justify-content:space-between;font-size:10px;color:#888;margin-top:6px}
+
+  /* 스타일/동행 칩 */
+  .chip-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .chip-card{border:1.5px solid #EEE;border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;background:#fff;display:flex;flex-direction:column;gap:4px;align-items:center}
+  .chip-card .emj{font-size:22px}
+  .chip-card .lb{font-size:12px;font-weight:700}
+  .chip-card.on{border-color:#111;background:var(--brand-bg)}
+  .comp-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px}
+  .comp-chip{border:1.5px solid #EEE;border-radius:12px;padding:12px 4px;text-align:center;cursor:pointer;font-size:12.5px;font-weight:700;background:#fff}
+  .comp-chip.on{border-color:#111;background:var(--brand-bg)}
+
+  .mode-badge{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;font-size:11px;font-weight:700;margin-bottom:14px}
+  .mode-badge.demo{background:#EFEFEF;color:#555}
+  .mode-badge.live{background:#E5F5EC;color:var(--green)}
+  .err{background:#FDECEC;color:#7a1e1e;padding:12px 14px;border-radius:10px;font-size:12.5px;margin-top:14px;display:none}
+  .err.on{display:block}
+
+  /* ===== 캘린더 모달 ===== */
+  .cal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:flex-end;justify-content:center}
+  .cal-overlay.on{display:flex}
+  .cal-sheet{background:#fff;width:100%;max-width:500px;border-radius:22px 22px 0 0;padding:20px 18px 24px 18px;max-height:88vh;overflow-y:auto;animation:slideUp .3s ease}
+  @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+  .cal-top{display:flex;align-items:center;margin-bottom:14px}
+  .cal-top .ttl{font-size:16px;font-weight:800;flex:1;text-align:center}
+  .cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 4px}
+  .cal-nav .mo{font-size:16px;font-weight:800}
+  .cal-nav button{background:#F4F4F4;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px}
+  .cal-week{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;margin-bottom:6px}
+  .cal-week div{font-size:11px;font-weight:700;padding:8px 0;color:#555}
+  .cal-week .sun{color:var(--red)}
+  .cal-week .sat{color:var(--blue)}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
+  .cal-cell{
+    aspect-ratio:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border-radius:10px;cursor:pointer;font-size:14px;font-weight:600;position:relative;
+    background:#fff;color:#111;user-select:none;
+  }
+  .cal-cell.other{color:#D0D0D0;cursor:default}
+  .cal-cell.past{color:#C5C5C5;cursor:not-allowed}
+  .cal-cell.sun{color:var(--red)}
+  .cal-cell.sat{color:var(--blue)}
+  .cal-cell.holiday{color:var(--red);background:#FDECEC}
+  .cal-cell.holiday .htag{font-size:8px;color:var(--red);font-weight:700;margin-top:1px;line-height:1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cal-cell.today{outline:2px solid #111}
+  .cal-cell.range{background:#FFF7DB;color:#111;border-radius:0}
+  .cal-cell.range.sun{color:var(--red)}
+  .cal-cell.range.sat{color:var(--blue)}
+  .cal-cell.start,.cal-cell.end{background:var(--brand);color:#111 !important;font-weight:800;border-radius:10px;z-index:2}
+  .cal-cell.start.holiday,.cal-cell.end.holiday{background:var(--brand)}
+  .cal-foot{display:flex;gap:10px;margin-top:18px}
+  .cal-info{padding:10px 14px;background:#F7F7F7;border-radius:10px;font-size:12px;text-align:center;margin-top:12px;color:#333;font-weight:600}
+
+  /* ===== 3. Loading ===== */
+  .loading{background:linear-gradient(160deg,#FFE27A 0%,#FFC72C 100%);justify-content:center;align-items:center;padding:32px;text-align:center;position:relative;overflow:hidden;flex:1;display:flex;flex-direction:column}
+  .timer{width:160px;height:160px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;flex-direction:column;box-shadow:0 20px 40px rgba(0,0,0,.12);position:relative}
+  .timer::before{content:"";position:absolute;inset:-10px;border-radius:50%;border:3px dashed #fff;animation:spin 8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .timer-num{font-size:48px;font-weight:800;color:#111;line-height:1}
+  .timer-lbl{font-size:11px;color:var(--muted);margin-top:4px;font-weight:600}
+  .loading-title{font-size:22px;font-weight:800;margin-top:30px;color:#111;line-height:1.3}
+  .loading-sub{font-size:12px;color:#333;margin-top:8px;max-width:280px}
+  .ls-list{margin-top:24px;width:100%;max-width:340px}
+  .ls{display:flex;align-items:center;gap:10px;padding:11px 14px;background:#ffffffb3;border-radius:10px;margin-bottom:7px;font-size:12.5px;font-weight:600;color:#333;text-align:left}
+  .ls .dot{width:8px;height:8px;border-radius:50%;background:#BBB;flex-shrink:0}
+  .ls.done .dot{background:var(--green)}
+  .ls.doing .dot{background:var(--orange);animation:pulse 1s infinite}
+  .ls.idle{opacity:.5}
+  @keyframes pulse{50%{transform:scale(1.5);opacity:.5}}
+
+  /* ===== 4. Result ===== */
+  .result-head{background:var(--brand);padding:4px 18px 18px 18px;flex-shrink:0}
+  .result-head .rh-top{display:flex;align-items:center;gap:10px;padding:10px 0}
+  .result-head .iconbtn{background:#111;color:var(--brand)}
+  .result-head h2{font-size:22px;font-weight:800;color:#111;margin-top:4px;line-height:1.25}
+  .result-head .sub{font-size:12px;color:#333;margin-top:2px}
+  .result-stats{display:flex;gap:8px;margin-top:14px}
+  .rs{flex:1;background:#fff;border-radius:12px;padding:10px 12px}
+  .rs .lbl{font-size:10px;color:var(--muted);font-weight:600}
+  .rs .val{font-size:15px;font-weight:800;color:#111;margin-top:2px}
+  .day-tabs{display:flex;gap:8px;padding:14px 18px 6px 18px;overflow-x:auto;flex-shrink:0;background:#fff;border-bottom:1px solid var(--line)}
+  .day-tabs::-webkit-scrollbar{display:none}
+  .day-tab{padding:8px 14px;border-radius:10px;background:#F3F3F3;font-size:12px;font-weight:700;color:#555;white-space:nowrap;flex-shrink:0;cursor:pointer;border:none;font-family:inherit}
+  .day-tab.on{background:#111;color:#fff}
+
+  .timeline{padding:16px 18px 16px 40px;position:relative}
+  .timeline::before{content:"";position:absolute;left:24px;top:22px;bottom:22px;width:2px;background:#EEE}
+  .tl-item{position:relative;margin-bottom:14px}
+  .tl-item::before{content:"";position:absolute;left:-21px;top:8px;width:13px;height:13px;border-radius:50%;background:var(--brand);border:3px solid #fff;box-shadow:0 0 0 2px var(--brand)}
+  .tl-time{font-size:11px;color:var(--muted);font-weight:600;margin-bottom:4px}
+  .tl-card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;cursor:pointer;transition:transform .15s, box-shadow .15s}
+  .tl-card:active{transform:scale(.98)}
+  .tl-photo{height:140px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .tl-photo .emoji{font-size:52px;filter:drop-shadow(0 2px 4px rgba(0,0,0,.2));position:relative;z-index:1}
+  .tl-photo::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.25), transparent 60%);z-index:1}
+  .tl-photo .tl-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease;z-index:2;display:block}
+  .tl-photo .tl-img.loaded{opacity:1}
+  .tl-photo .tl-img.loaded ~ .emoji{opacity:0}
+  .tl-photo .badge{position:absolute;top:10px;left:10px;background:#ffffffe6;backdrop-filter:blur(4px);padding:6px 11px;border-radius:8px;font-size:13px;font-weight:800;color:#111;z-index:3;letter-spacing:-.2px}
+  .tl-body{padding:14px}
+  .tl-body .name{font-size:17px;font-weight:800;color:#111;line-height:1.3;letter-spacing:-.3px;word-break:keep-all;overflow-wrap:anywhere}
+  .tl-body .cat{font-size:12px;color:var(--muted);margin-top:3px;font-weight:600}
+  .tl-body .note{font-size:12.5px;color:#555;margin-top:6px;line-height:1.5}
+  .tl-body .metrics{display:flex;gap:5px;margin-top:10px;flex-wrap:wrap}
+  .tl-transit{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#FAFAFA;border-radius:10px;margin:6px 0;font-size:11px;color:#666}
+  .tl-transit .mode{background:#fff;border:1px solid var(--line);padding:3px 8px;border-radius:20px;font-weight:600;color:#333}
+
+  /* 색상 테마 */
+  .photo-food{background:linear-gradient(135deg,#FFB347,#FF6B6B)}
+  .photo-asianfood{background:linear-gradient(135deg,#FF9F43,#EE5A24)}
+  .photo-cafe{background:linear-gradient(135deg,#D4A574,#8B5A2B)}
+  .photo-hotel{background:linear-gradient(135deg,#5DADE2,#1B4F72)}
+  .photo-nature{background:linear-gradient(135deg,#82E0AA,#229954)}
+  .photo-night{background:linear-gradient(135deg,#6A0DAD,#1B1464)}
+  .photo-shopping{background:linear-gradient(135deg,#EC7FB3,#8E44AD)}
+  .photo-culture{background:linear-gradient(135deg,#48C9B0,#117864)}
+  .photo-beach{background:linear-gradient(135deg,#5DADE2,#2874A6)}
+  .photo-airport{background:linear-gradient(135deg,#95A5A6,#34495E)}
+  .photo-market{background:linear-gradient(135deg,#F4D03F,#D35400)}
+  .photo-activity{background:linear-gradient(135deg,#FF7B89,#EA384D)}
+
+  /* ===== 5. Detail ===== */
+  .detail{background:#fff}
+  .dt-hero{height:240px;position:relative;display:flex;align-items:flex-end;padding:16px;color:#fff;flex-shrink:0;overflow:hidden}
+  .dt-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.55),transparent 50%);z-index:2}
+  .dt-hero .dt-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .35s ease;z-index:1;display:block}
+  .dt-hero .dt-img.loaded{opacity:1}
+  .dt-hero .dt-emoji{position:absolute;right:24px;top:50%;transform:translateY(-50%);font-size:110px;opacity:.85;filter:drop-shadow(0 4px 8px rgba(0,0,0,.3));z-index:2;transition:opacity .3s}
+  .dt-hero .dt-img.loaded ~ .dt-emoji{opacity:0}
+  .dt-hero .back-btn{position:absolute;top:14px;left:14px;background:#fff;color:#111;z-index:3}
+  .dt-hero .title-box{position:relative;z-index:2}
+  .dt-hero h3{font-size:22px;font-weight:800;color:#fff;line-height:1.25;max-width:60%}
+  .dt-hero .loc{font-size:12px;margin-top:4px;opacity:.95}
+  .dt-body{padding:18px;flex:1;overflow-y:auto}
+  .metric-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .metric{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px}
+  .metric .lbl{font-size:10.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+  .metric .num{font-size:22px;font-weight:800;margin-top:6px}
+  .metric.green .num{color:var(--green)}
+  .metric.red .num{color:var(--red)}
+  .metric .sub{font-size:10.5px;color:#999;margin-top:2px}
+  .bar-mini{height:5px;background:#F0F0F0;border-radius:3px;margin-top:8px;overflow:hidden}
+  .bar-mini .fill{height:100%}
+  .book-bar{border-top:1px solid var(--line);padding:14px 18px 22px 18px;display:flex;gap:10px;align-items:center;background:#fff;flex-shrink:0}
+
+  /* ===== 6. Booking ===== */
+  .bk-wrap{padding:6px 22px 22px 22px}
+
+  /* ===== 0. Auth (로그인/회원가입) ===== */
+  .auth{background:linear-gradient(180deg, #FFF7DB 0%, #FFFFFF 45%);padding:0;overflow-y:auto}
+  .auth-wrap{min-height:100%;display:flex;flex-direction:column;padding:56px 26px 28px 26px}
+  .auth-logo{font-size:40px;font-weight:800;letter-spacing:-1.5px;line-height:1.05;color:#111;text-align:center}
+  .auth-logo .small{display:block;font-size:13px;letter-spacing:.5px;font-weight:600;color:#6B7280;margin-top:8px}
+  .auth-hero{text-align:center;margin-top:20px}
+  .auth-hero .emoji{font-size:40px}
+  .auth-hero h2{font-size:20px;font-weight:800;margin-top:6px;letter-spacing:-.3px}
+  .auth-hero p{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.55}
+  .auth-tabs{display:flex;background:#F3F3F3;border-radius:12px;padding:4px;margin-top:26px}
+  .auth-tab{flex:1;padding:11px 0;border:none;background:transparent;font-size:14px;font-weight:700;color:#777;border-radius:9px;cursor:pointer;font-family:inherit;transition:all .18s}
+  .auth-tab.on{background:#fff;color:#111;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+  .auth-form{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .auth-field{background:#fff;border:1.5px solid #EEE;border-radius:13px;padding:12px 14px;display:flex;align-items:center;gap:10px;transition:border-color .15s}
+  .auth-field:focus-within{border-color:var(--brand)}
+  .auth-field .ic{font-size:16px;color:#999;width:20px;text-align:center}
+  .auth-field input{flex:1;border:none;outline:none;background:transparent;font-size:14.5px;font-family:inherit;color:#111;font-weight:500;min-width:0}
+  .auth-field input::placeholder{color:#AAA;font-weight:400}
+  .auth-error{color:var(--red);font-size:12px;font-weight:600;min-height:16px;margin-top:2px;padding-left:4px}
+  .auth-submit{margin-top:6px}
+  .auth-divider{display:flex;align-items:center;gap:10px;margin:22px 0 14px 0;color:#999;font-size:11.5px;font-weight:600}
+  .auth-divider:before,.auth-divider:after{content:"";flex:1;height:1px;background:#EEE}
+  .auth-social{display:flex;flex-direction:column;gap:9px}
+  .auth-social .btn{background:#fff;border:1.5px solid #EEE;color:#222;font-weight:700;font-size:14px;padding:14px}
+  .auth-social .btn:hover{border-color:#DDD}
+  .auth-social .btn .ic{font-size:18px;display:inline-flex;align-items:center;justify-content:center;width:22px}
+  .auth-foot{text-align:center;font-size:12px;color:var(--muted);margin-top:22px;line-height:1.6}
+  .auth-foot a{color:#111;font-weight:700;text-decoration:underline;cursor:pointer}
+  .auth-skip{text-align:center;margin-top:18px}
+  .auth-skip a{font-size:13px;color:#666;text-decoration:underline;cursor:pointer}
+  .auth-check{display:flex;align-items:center;gap:8px;font-size:12px;color:#555;margin-top:2px;padding-left:4px;user-select:none;cursor:pointer}
+  .auth-check input{width:14px;height:14px;accent-color:var(--brand)}
+  .pw-toggle{background:transparent;border:none;color:#999;font-size:12px;cursor:pointer;padding:2px 6px;font-weight:600}
+  .user-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#111;color:var(--brand);font-size:12px;font-weight:700;margin-top:12px}
+  .user-chip .avatar{width:22px;height:22px;border-radius:50%;background:var(--brand);color:#111;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  .splash-user{position:absolute;top:16px;right:16px;z-index:3;display:flex;align-items:center;gap:8px}
+  .splash-user .logout{background:#11111140;color:#111;border:none;border-radius:999px;padding:6px 12px;font-size:11.5px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px)}
+
+  /* ===== 7. Settings ===== */
+  .settings{padding:14px 22px 22px 22px}
+  .settings .row{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin-bottom:10px}
+  .settings .row label{font-size:11px;color:var(--muted);font-weight:700;display:block;margin-bottom:6px;text-transform:uppercase}
+  .settings .row input{width:100%;padding:10px 0;border:none;outline:none;font-size:14px;font-family:inherit;background:transparent}
+  .settings-note{background:var(--brand-bg);border-radius:12px;padding:12px 14px;font-size:12px;line-height:1.55;color:#5b4a00;margin-bottom:16px}
+
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============== 0. AUTH (로그인/회원가입) ============== -->
+  <div class="view auth" id="view-auth">
+    <div class="auth-wrap">
+      <div class="auth-logo">3초 여행<span class="small">3 SECOND TRIP</span></div>
+
+      <div class="auth-hero">
+        <div class="emoji">✈️</div>
+        <h2 id="authTitle">다시 오신 걸 환영해요</h2>
+        <p id="authSub">AI가 맞춤 일정을 완성해드릴게요</p>
+      </div>
+
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tabLogin" onclick="switchAuth('login')">로그인</button>
+        <button class="auth-tab" id="tabSignup" onclick="switchAuth('signup')">회원가입</button>
+      </div>
+
+      <form class="auth-form" id="authForm" onsubmit="return submitAuth(event)">
+        <div class="auth-field" id="fieldName" style="display:none">
+          <span class="ic">👤</span>
+          <input type="text" id="authName" placeholder="이름 (닉네임)" autocomplete="name"/>
+        </div>
+        <div class="auth-field">
+          <span class="ic">✉️</span>
+          <input type="email" id="authEmail" placeholder="이메일 주소" autocomplete="email" required/>
+        </div>
+        <div class="auth-field">
+          <span class="ic">🔒</span>
+          <input type="password" id="authPw" placeholder="비밀번호 (6자 이상)" autocomplete="current-password" required minlength="6"/>
+          <button type="button" class="pw-toggle" onclick="togglePw()">보기</button>
+        </div>
+        <div class="auth-field" id="fieldPw2" style="display:none">
+          <span class="ic">🔑</span>
+          <input type="password" id="authPw2" placeholder="비밀번호 확인" autocomplete="new-password"/>
+        </div>
+        <label class="auth-check" id="checkRemember">
+          <input type="checkbox" id="authRemember" checked/>
+          <span>로그인 상태 유지</span>
+        </label>
+        <label class="auth-check" id="checkAgree" style="display:none">
+          <input type="checkbox" id="authAgree"/>
+          <span>이용약관 및 개인정보처리방침 동의</span>
+        </label>
+        <div class="auth-error" id="authError"></div>
+        <button type="submit" class="btn btn-primary auth-submit" id="authSubmit">로그인</button>
+      </form>
+
+      <div class="auth-divider">또는</div>
+
+      <div class="auth-social">
+        <button class="btn" onclick="socialLogin('google')"><span class="ic">🟢</span> Google로 계속하기</button>
+        <button class="btn" onclick="socialLogin('kakao')" style="background:#FEE500;border-color:#FEE500"><span class="ic">💬</span> 카카오로 계속하기</button>
+        <button class="btn" onclick="socialLogin('apple')" style="background:#111;color:#fff;border-color:#111"><span class="ic">🍎</span> Apple로 계속하기</button>
+      </div>
+
+      <div class="auth-skip"><a onclick="skipAuth()">로그인 없이 둘러보기 →</a></div>
+
+      <div class="auth-foot" id="authFoot">
+        계정이 없으신가요? <a onclick="switchAuth('signup')">회원가입</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== 1. SPLASH ============== -->
+  <div class="view active splash" id="view-splash">
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+    <div class="splash-user" id="splashUser" style="display:none">
+      <button class="logout" onclick="logout()">로그아웃</button>
+    </div>
+    <div class="splash-center">
+      <div class="splash-logo">3초 여행<span class="small">3 Second Trip</span></div>
+      <div class="splash-sub">진짜 현지 경험을<br/>30초 안에 완성형 일정으로</div>
+      <div class="splash-tags">
+        <span class="t">🧭 현지인 데이터</span>
+        <span class="t">⏱️ 실측 이동시간</span>
+        <span class="t">🤖 AI 자동 생성</span>
+      </div>
+      <div class="user-chip" id="userChip" style="display:none">
+        <span class="avatar" id="userAvatar">J</span>
+        <span id="userGreeting">환영합니다</span>
+      </div>
+    </div>
+    <div class="cta-block">
+      <button class="btn btn-dark" onclick="go('auth')">시작하기 →</button>
+      <div class="cta-sub"><a href="#" onclick="go('settings');return false">⚙️ OpenAI API 키 설정</a></div>
+    </div>
+  </div>
+
+  <!-- ============== 2. INPUT ============== -->
+  <div class="view" id="view-input">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('splash')">←</button>
+      <div class="title">새 여행 만들기</div>
+    </div>
+    <div class="view-scroll">
+      <div class="form-wrap">
+        <h2 class="h-title">어떤 여행을<br/>준비하고 계세요?</h2>
+        <p class="h-sub">입력만 하면 AI가 현지인 데이터로 일정을 완성합니다</p>
+
+        <div class="field">
+          <div class="field-label">🌏 목적지</div>
+          <div class="pop-title">🔥 인기 여행지</div>
+          <div class="pop-grid" id="popGrid"></div>
+          <div class="pop-title" style="margin-top:16px">🔎 직접 검색</div>
+          <div class="dest-search">
+            <div class="dest-input-wrap" id="destWrap">
+              <span class="sel-flag" id="destFlag">🌏</span>
+              <input id="destInput" placeholder="도시명 또는 국가명 입력 (예: 도쿄, 베트남)" autocomplete="off"/>
+              <span class="sel-clear" onclick="clearDest()">×</span>
+            </div>
+            <div class="dest-dropdown" id="destDropdown"></div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">📅 여행 일정</div>
+          <div class="date-row">
+            <div class="date-field" id="dfStart" onclick="openCal('start')">
+              <div class="lb">출발</div>
+              <div class="val placeholder" id="dfStartVal">날짜 선택</div>
+            </div>
+            <div class="date-field" id="dfEnd" onclick="openCal('end')">
+              <div class="lb">도착</div>
+              <div class="val placeholder" id="dfEndVal">날짜 선택</div>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px" id="dateInfo">달력에서 날짜를 선택하세요</div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">💰 예산 (1인, 항공 포함)</div>
+          <div class="budget-box">
+            <div style="font-size:11px;color:#999">총 예산</div>
+            <div class="budget-row">
+              <span class="budget-amt" id="budgetAmt">₩ 1,200,000</span>
+              <span class="budget-tier mid" id="budgetTier">중간</span>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" class="slider" id="budgetSlider" min="30" max="1000" value="120" step="10"/>
+              <div class="budget-ticks"><span>₩30만</span><span>₩300만</span><span>₩600만</span><span>₩1,000만</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">✨ 여행 스타일 (복수 선택)</div>
+          <div class="chip-grid" id="styleGrid"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">👥 동행</div>
+          <div class="comp-grid" id="compGrid"></div>
+        </div>
+
+        <div class="err" id="formErr"></div>
+      </div>
+    </div>
+    <div class="footer-cta">
+      <div class="mode-badge" id="modeBadge">🎭 데모 모드 (API 키 없음)</div>
+      <button class="btn btn-primary" onclick="submitForm()">AI 일정 생성하기 →</button>
+    </div>
+  </div>
+
+  <!-- ============== 3. LOADING ============== -->
+  <div class="view" id="view-loading">
+    <div class="loading">
+      <div class="timer"><div class="timer-num" id="timerNum">3</div><div class="timer-lbl">초 남았어요</div></div>
+      <div class="loading-title" id="loadingTitle">현지인이 가는 곳만<br/>골라내는 중...</div>
+      <div class="loading-sub">예산·시간대·계절을 분석해 최적 장소 매칭</div>
+      <div class="ls-list" id="lsList">
+        <div class="ls doing"><div class="dot"></div>입력값 분석 (예산·기간·동행)</div>
+        <div class="ls idle"><div class="dot"></div>현지인 방문 비율 70%+ 필터링</div>
+        <div class="ls idle"><div class="dot"></div>시간대별 장소 매칭 + 이동시간 계산</div>
+        <div class="ls idle"><div class="dot"></div>AI 일정 최적화 완료</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============== 4. RESULT ============== -->
+  <div class="view" id="view-result">
+    <div class="result-head">
+      <div class="rh-top">
+        <button class="iconbtn" onclick="go('input')">←</button>
+        <div style="margin-left:auto;display:flex;gap:8px">
+          <button class="iconbtn" onclick="regenerate()" title="재생성">↻</button>
+          <button class="iconbtn" onclick="saveTrip()" title="저장">♡</button>
+        </div>
+      </div>
+      <h2 id="resTitle">여행 일정</h2>
+      <div class="sub" id="resSub">-</div>
+      <div class="result-stats">
+        <div class="rs"><div class="lbl">장소</div><div class="val" id="stPlaces">-</div></div>
+        <div class="rs"><div class="lbl">현지인 %</div><div class="val" id="stLocal">-</div></div>
+        <div class="rs"><div class="lbl">일수</div><div class="val" id="stDays">-</div></div>
+      </div>
+    </div>
+    <div class="day-tabs" id="dayTabs"></div>
+    <div class="view-scroll" id="dayContent"></div>
+    <div class="footer-cta">
+      <button class="btn btn-dark" onclick="go('booking')">예약하러 가기</button>
+    </div>
+  </div>
+
+  <!-- ============== 5. DETAIL ============== -->
+  <div class="view detail" id="view-detail">
+    <div class="dt-hero" id="dtHero">
+      <button class="iconbtn back-btn" onclick="go('result')">←</button>
+      <div class="dt-emoji" id="dtEmoji">📍</div>
+      <div class="title-box">
+        <span class="pill brand" id="dtBadge">로컬 추천</span>
+        <h3 id="dtName">-</h3>
+        <div class="loc" id="dtLoc">-</div>
+      </div>
+    </div>
+    <div class="dt-body">
+      <div style="font-size:13px;color:#333;line-height:1.6;margin-bottom:16px" id="dtDesc"></div>
+      <div class="metric-grid">
+        <div class="metric green">
+          <div class="lbl">현지인 방문 비율</div>
+          <div class="num" id="dtLocal">-</div>
+          <div class="sub">Foursquare Local Ratio</div>
+          <div class="bar-mini"><div class="fill" id="dtLocalBar" style="background:var(--green);width:0%"></div></div>
+        </div>
+        <div class="metric red">
+          <div class="lbl">혼잡도 / 대기</div>
+          <div class="num" id="dtCrowd">-</div>
+          <div class="sub" id="dtCrowdSub">-</div>
+        </div>
+        <div class="metric">
+          <div class="lbl">추천 시간</div>
+          <div class="num" style="font-size:15px" id="dtTime">-</div>
+        </div>
+        <div class="metric">
+          <div class="lbl">예상 비용</div>
+          <div class="num" style="font-size:15px" id="dtPrice">-</div>
+        </div>
+      </div>
+    </div>
+    <div class="book-bar">
+      <button class="btn btn-ghost" onclick="openMap()" style="flex:1">🗺️ 구글 맵</button>
+      <button class="btn btn-primary" onclick="openBooking()" style="flex:1.2">예약하기</button>
+    </div>
+  </div>
+
+  <!-- ============== 6. BOOKING ============== -->
+  <div class="view" id="view-booking">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('result')">←</button>
+      <div class="title">예약 연동</div>
+    </div>
+    <div class="view-scroll">
+      <div class="bk-wrap">
+        <h2 class="h-title">일정이 확정되었어요</h2>
+        <p class="h-sub">한 번에 전부 예약하면 계획 → 실행이 10배 빨라집니다</p>
+        <div style="margin-top:20px;background:#FFFBEA;border-radius:14px;padding:16px;border:1.5px dashed var(--brand)">
+          <div style="font-size:11px;color:#8B5E00;font-weight:700">예상 TOTAL</div>
+          <div style="font-size:28px;font-weight:800;margin-top:4px" id="bkTotal">₩ 842,300</div>
+          <div style="font-size:11px;color:#8B5E00;margin-top:4px">숙소 + 교통 + 액티비티</div>
+        </div>
+        <div style="margin-top:18px" id="bookingList"></div>
+      </div>
+    </div>
+    <div class="footer-cta">
+      <button class="btn btn-primary" onclick="alert('실제 앱에서는 파트너 API로 일괄 결제 연동됩니다.')">모두 한 번에 예약</button>
+    </div>
+  </div>
+
+  <!-- ============== 7. SETTINGS ============== -->
+  <div class="view" id="view-settings">
+    <div class="topbar">
+      <button class="iconbtn" onclick="go('splash')">←</button>
+      <div class="title">설정</div>
+    </div>
+    <div class="view-scroll">
+      <div class="settings">
+        <div class="settings-note">
+          <b>🔑 OpenAI API 키를 입력하면 실제 GPT-4o가 일정을 생성합니다.</b><br/>
+          키는 이 페이지 메모리에만 저장되며 새로고침하면 지워집니다.
+          키가 없어도 <b>데모 모드</b>로 전체 플로우를 체험할 수 있어요.
+        </div>
+        <div class="row">
+          <label>OpenAI API Key</label>
+          <input type="password" id="apiKeyInput" placeholder="sk-..." />
+        </div>
+        <div class="row">
+          <label>모델</label>
+          <input type="text" id="modelInput" value="gpt-4o-mini" />
+        </div>
+        <div class="err" id="setErr"></div>
+        <button class="btn btn-dark" onclick="saveKey()" style="margin-top:16px">저장하고 돌아가기</button>
+        <button class="btn btn-ghost" onclick="clearKey()" style="margin-top:8px">키 삭제 (데모 모드)</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script>
+/* ===== 도시 DB ===== */
+const CITIES = [
+  // ===== 한국 =====
+  { key:"seoul", name:"서울", country:"대한민국", flag:"🇰🇷", alias:["seoul","한국","korea"] },
+  { key:"busan", name:"부산", country:"대한민국", flag:"🇰🇷", alias:["busan"] },
+  { key:"jeju", name:"제주", country:"대한민국", flag:"🇰🇷", alias:["jeju"] },
+  { key:"incheon", name:"인천", country:"대한민국", flag:"🇰🇷", alias:["incheon"] },
+  { key:"daegu", name:"대구", country:"대한민국", flag:"🇰🇷", alias:["daegu"] },
+  { key:"daejeon", name:"대전", country:"대한민국", flag:"🇰🇷", alias:["daejeon"] },
+  { key:"gwangju", name:"광주", country:"대한민국", flag:"🇰🇷", alias:["gwangju"] },
+  { key:"ulsan", name:"울산", country:"대한민국", flag:"🇰🇷", alias:["ulsan"] },
+  { key:"gyeongju", name:"경주", country:"대한민국", flag:"🇰🇷", alias:["gyeongju"] },
+  { key:"jeonju", name:"전주", country:"대한민국", flag:"🇰🇷", alias:["jeonju"] },
+  { key:"yeosu", name:"여수", country:"대한민국", flag:"🇰🇷", alias:["yeosu"] },
+  { key:"gangneung", name:"강릉", country:"대한민국", flag:"🇰🇷", alias:["gangneung"] },
+  { key:"sokcho", name:"속초", country:"대한민국", flag:"🇰🇷", alias:["sokcho"] },
+  { key:"chuncheon", name:"춘천", country:"대한민국", flag:"🇰🇷", alias:["chuncheon"] },
+  { key:"pohang", name:"포항", country:"대한민국", flag:"🇰🇷", alias:["pohang"] },
+  { key:"andong", name:"안동", country:"대한민국", flag:"🇰🇷", alias:["andong"] },
+  { key:"tongyeong", name:"통영", country:"대한민국", flag:"🇰🇷", alias:["tongyeong"] },
+  { key:"ulleungdo", name:"울릉도", country:"대한민국", flag:"🇰🇷", alias:["ulleung"] },
+
+  // ===== 일본 =====
+  { key:"tokyo", name:"도쿄", country:"일본", flag:"🇯🇵", alias:["tokyo","東京","일본","japan"] },
+  { key:"osaka", name:"오사카", country:"일본", flag:"🇯🇵", alias:["osaka","大阪"] },
+  { key:"kyoto", name:"교토", country:"일본", flag:"🇯🇵", alias:["kyoto","京都"] },
+  { key:"fukuoka", name:"후쿠오카", country:"일본", flag:"🇯🇵", alias:["fukuoka","福岡"] },
+  { key:"sapporo", name:"삿포로", country:"일본", flag:"🇯🇵", alias:["sapporo","札幌","홋카이도"] },
+  { key:"nagoya", name:"나고야", country:"일본", flag:"🇯🇵", alias:["nagoya","名古屋"] },
+  { key:"yokohama", name:"요코하마", country:"일본", flag:"🇯🇵", alias:["yokohama","横浜"] },
+  { key:"okinawa", name:"오키나와", country:"일본", flag:"🇯🇵", alias:["okinawa","沖縄"] },
+  { key:"nara", name:"나라", country:"일본", flag:"🇯🇵", alias:["nara","奈良"] },
+  { key:"kobe", name:"고베", country:"일본", flag:"🇯🇵", alias:["kobe","神戸"] },
+  { key:"hiroshima", name:"히로시마", country:"일본", flag:"🇯🇵", alias:["hiroshima","広島"] },
+  { key:"sendai", name:"센다이", country:"일본", flag:"🇯🇵", alias:["sendai","仙台"] },
+  { key:"kanazawa", name:"가나자와", country:"일본", flag:"🇯🇵", alias:["kanazawa","金沢"] },
+  { key:"hakodate", name:"하코다테", country:"일본", flag:"🇯🇵", alias:["hakodate","函館"] },
+  { key:"nikko", name:"닛코", country:"일본", flag:"🇯🇵", alias:["nikko","日光"] },
+  { key:"hakone", name:"하코네", country:"일본", flag:"🇯🇵", alias:["hakone","箱根"] },
+  { key:"kamakura", name:"가마쿠라", country:"일본", flag:"🇯🇵", alias:["kamakura","鎌倉"] },
+  { key:"beppu", name:"벳부", country:"일본", flag:"🇯🇵", alias:["beppu","別府"] },
+  { key:"nagasaki", name:"나가사키", country:"일본", flag:"🇯🇵", alias:["nagasaki","長崎"] },
+  { key:"ishigaki", name:"이시가키", country:"일본", flag:"🇯🇵", alias:["ishigaki","石垣"] },
+
+  // ===== 중국 & 홍콩/마카오/대만 =====
+  { key:"beijing", name:"베이징", country:"중국", flag:"🇨🇳", alias:["beijing","北京","중국","china"] },
+  { key:"shanghai", name:"상하이", country:"중국", flag:"🇨🇳", alias:["shanghai","上海"] },
+  { key:"guangzhou", name:"광저우", country:"중국", flag:"🇨🇳", alias:["guangzhou","广州"] },
+  { key:"shenzhen", name:"선전", country:"중국", flag:"🇨🇳", alias:["shenzhen","深圳"] },
+  { key:"chengdu", name:"청두", country:"중국", flag:"🇨🇳", alias:["chengdu","成都"] },
+  { key:"xian", name:"시안", country:"중국", flag:"🇨🇳", alias:["xian","西安"] },
+  { key:"guilin", name:"구이린", country:"중국", flag:"🇨🇳", alias:["guilin","桂林"] },
+  { key:"suzhou", name:"쑤저우", country:"중국", flag:"🇨🇳", alias:["suzhou","苏州"] },
+  { key:"hangzhou", name:"항저우", country:"중국", flag:"🇨🇳", alias:["hangzhou","杭州"] },
+  { key:"qingdao", name:"칭다오", country:"중국", flag:"🇨🇳", alias:["qingdao","青岛"] },
+  { key:"dalian", name:"다롄", country:"중국", flag:"🇨🇳", alias:["dalian","大连"] },
+  { key:"chongqing", name:"충칭", country:"중국", flag:"🇨🇳", alias:["chongqing","重庆"] },
+  { key:"harbin", name:"하얼빈", country:"중국", flag:"🇨🇳", alias:["harbin","哈尔滨"] },
+  { key:"lhasa", name:"라싸", country:"중국", flag:"🇨🇳", alias:["lhasa","티베트"] },
+  { key:"hongkong", name:"홍콩", country:"홍콩", flag:"🇭🇰", alias:["hong kong","香港"] },
+  { key:"macau", name:"마카오", country:"마카오", flag:"🇲🇴", alias:["macau","澳門"] },
+  { key:"taipei", name:"타이베이", country:"대만", flag:"🇹🇼", alias:["taipei","대만","台北","taiwan"] },
+  { key:"kaohsiung", name:"가오슝", country:"대만", flag:"🇹🇼", alias:["kaohsiung","高雄"] },
+  { key:"taichung", name:"타이중", country:"대만", flag:"🇹🇼", alias:["taichung","台中"] },
+  { key:"tainan", name:"타이난", country:"대만", flag:"🇹🇼", alias:["tainan","台南"] },
+  { key:"jiufen", name:"지우펀", country:"대만", flag:"🇹🇼", alias:["jiufen","九份"] },
+  { key:"hualien", name:"화롄", country:"대만", flag:"🇹🇼", alias:["hualien","花蓮"] },
+
+  // ===== 동남아 =====
+  { key:"bangkok", name:"방콕", country:"태국", flag:"🇹🇭", alias:["bangkok","태국","thailand"] },
+  { key:"chiangmai", name:"치앙마이", country:"태국", flag:"🇹🇭", alias:["chiangmai","chiang mai"] },
+  { key:"chiangrai", name:"치앙라이", country:"태국", flag:"🇹🇭", alias:["chiangrai"] },
+  { key:"phuket", name:"푸켓", country:"태국", flag:"🇹🇭", alias:["phuket"] },
+  { key:"pattaya", name:"파타야", country:"태국", flag:"🇹🇭", alias:["pattaya"] },
+  { key:"krabi", name:"끄라비", country:"태국", flag:"🇹🇭", alias:["krabi"] },
+  { key:"kohsamui", name:"코사무이", country:"태국", flag:"🇹🇭", alias:["koh samui","사무이"] },
+  { key:"hanoi", name:"하노이", country:"베트남", flag:"🇻🇳", alias:["hanoi","베트남","vietnam"] },
+  { key:"hcmc", name:"호치민", country:"베트남", flag:"🇻🇳", alias:["ho chi minh","saigon","사이공"] },
+  { key:"danang", name:"다낭", country:"베트남", flag:"🇻🇳", alias:["danang","da nang"] },
+  { key:"hoian", name:"호이안", country:"베트남", flag:"🇻🇳", alias:["hoi an","호이안"] },
+  { key:"nhatrang", name:"나트랑", country:"베트남", flag:"🇻🇳", alias:["nha trang"] },
+  { key:"phuquoc", name:"푸꾸옥", country:"베트남", flag:"🇻🇳", alias:["phu quoc"] },
+  { key:"dalat", name:"달랏", country:"베트남", flag:"🇻🇳", alias:["dalat","da lat"] },
+  { key:"singapore", name:"싱가포르", country:"싱가포르", flag:"🇸🇬", alias:["singapore"] },
+  { key:"kualalumpur", name:"쿠알라룸푸르", country:"말레이시아", flag:"🇲🇾", alias:["kuala lumpur","kl","말레이시아"] },
+  { key:"penang", name:"페낭", country:"말레이시아", flag:"🇲🇾", alias:["penang"] },
+  { key:"langkawi", name:"랑카위", country:"말레이시아", flag:"🇲🇾", alias:["langkawi"] },
+  { key:"kotakinabalu", name:"코타키나발루", country:"말레이시아", flag:"🇲🇾", alias:["kota kinabalu","kk"] },
+  { key:"jakarta", name:"자카르타", country:"인도네시아", flag:"🇮🇩", alias:["jakarta","인도네시아"] },
+  { key:"bali", name:"발리", country:"인도네시아", flag:"🇮🇩", alias:["bali","denpasar","우붓","ubud"] },
+  { key:"lombok", name:"롬복", country:"인도네시아", flag:"🇮🇩", alias:["lombok"] },
+  { key:"yogyakarta", name:"족자카르타", country:"인도네시아", flag:"🇮🇩", alias:["yogyakarta","jogja"] },
+  { key:"bandung", name:"반둥", country:"인도네시아", flag:"🇮🇩", alias:["bandung"] },
+  { key:"cebu", name:"세부", country:"필리핀", flag:"🇵🇭", alias:["cebu","필리핀","philippines"] },
+  { key:"manila", name:"마닐라", country:"필리핀", flag:"🇵🇭", alias:["manila"] },
+  { key:"boracay", name:"보라카이", country:"필리핀", flag:"🇵🇭", alias:["boracay"] },
+  { key:"palawan", name:"팔라완", country:"필리핀", flag:"🇵🇭", alias:["palawan","el nido"] },
+  { key:"davao", name:"다바오", country:"필리핀", flag:"🇵🇭", alias:["davao"] },
+  { key:"phnompenh", name:"프놈펜", country:"캄보디아", flag:"🇰🇭", alias:["phnom penh","캄보디아"] },
+  { key:"siemreap", name:"시엠립", country:"캄보디아", flag:"🇰🇭", alias:["siem reap","앙코르","angkor"] },
+  { key:"vientiane", name:"비엔티안", country:"라오스", flag:"🇱🇦", alias:["vientiane","라오스"] },
+  { key:"luangprabang", name:"루앙프라방", country:"라오스", flag:"🇱🇦", alias:["luang prabang"] },
+  { key:"yangon", name:"양곤", country:"미얀마", flag:"🇲🇲", alias:["yangon","미얀마","myanmar"] },
+  { key:"bagan", name:"바간", country:"미얀마", flag:"🇲🇲", alias:["bagan"] },
+  { key:"mandalay", name:"만달레이", country:"미얀마", flag:"🇲🇲", alias:["mandalay"] },
+  { key:"bruneibsb", name:"반다르세리베가완", country:"브루나이", flag:"🇧🇳", alias:["bandar seri begawan","brunei"] },
+
+  // ===== 남아시아 =====
+  { key:"delhi", name:"델리", country:"인도", flag:"🇮🇳", alias:["delhi","new delhi","india","인도"] },
+  { key:"mumbai", name:"뭄바이", country:"인도", flag:"🇮🇳", alias:["mumbai","bombay"] },
+  { key:"bangalore", name:"방갈로르", country:"인도", flag:"🇮🇳", alias:["bangalore","bengaluru"] },
+  { key:"jaipur", name:"자이푸르", country:"인도", flag:"🇮🇳", alias:["jaipur"] },
+  { key:"agra", name:"아그라", country:"인도", flag:"🇮🇳", alias:["agra","taj mahal","타지마할"] },
+  { key:"varanasi", name:"바라나시", country:"인도", flag:"🇮🇳", alias:["varanasi"] },
+  { key:"goa", name:"고아", country:"인도", flag:"🇮🇳", alias:["goa"] },
+  { key:"kolkata", name:"콜카타", country:"인도", flag:"🇮🇳", alias:["kolkata","calcutta"] },
+  { key:"chennai", name:"첸나이", country:"인도", flag:"🇮🇳", alias:["chennai","madras"] },
+  { key:"kochi", name:"코치", country:"인도", flag:"🇮🇳", alias:["kochi","cochin","케랄라"] },
+  { key:"kathmandu", name:"카트만두", country:"네팔", flag:"🇳🇵", alias:["kathmandu","네팔","nepal"] },
+  { key:"pokhara", name:"포카라", country:"네팔", flag:"🇳🇵", alias:["pokhara"] },
+  { key:"colombo", name:"콜롬보", country:"스리랑카", flag:"🇱🇰", alias:["colombo","sri lanka","스리랑카"] },
+  { key:"kandy", name:"캔디", country:"스리랑카", flag:"🇱🇰", alias:["kandy"] },
+  { key:"male", name:"말레", country:"몰디브", flag:"🇲🇻", alias:["male","maldives","몰디브"] },
+  { key:"dhaka", name:"다카", country:"방글라데시", flag:"🇧🇩", alias:["dhaka","bangladesh"] },
+  { key:"thimphu", name:"팀부", country:"부탄", flag:"🇧🇹", alias:["thimphu","bhutan","부탄"] },
+
+  // ===== 중동 =====
+  { key:"dubai", name:"두바이", country:"UAE", flag:"🇦🇪", alias:["dubai","uae","에미리트"] },
+  { key:"abudhabi", name:"아부다비", country:"UAE", flag:"🇦🇪", alias:["abu dhabi"] },
+  { key:"doha", name:"도하", country:"카타르", flag:"🇶🇦", alias:["doha","qatar","카타르"] },
+  { key:"riyadh", name:"리야드", country:"사우디", flag:"🇸🇦", alias:["riyadh","saudi"] },
+  { key:"jeddah", name:"제다", country:"사우디", flag:"🇸🇦", alias:["jeddah"] },
+  { key:"muscat", name:"무스카트", country:"오만", flag:"🇴🇲", alias:["muscat","oman","오만"] },
+  { key:"istanbul", name:"이스탄불", country:"튀르키예", flag:"🇹🇷", alias:["istanbul","터키","turkey","튀르키예"] },
+  { key:"cappadocia", name:"카파도키아", country:"튀르키예", flag:"🇹🇷", alias:["cappadocia"] },
+  { key:"ankara", name:"앙카라", country:"튀르키예", flag:"🇹🇷", alias:["ankara"] },
+  { key:"antalya", name:"안탈리아", country:"튀르키예", flag:"🇹🇷", alias:["antalya"] },
+  { key:"izmir", name:"이즈미르", country:"튀르키예", flag:"🇹🇷", alias:["izmir"] },
+  { key:"jerusalem", name:"예루살렘", country:"이스라엘", flag:"🇮🇱", alias:["jerusalem","israel","이스라엘"] },
+  { key:"telaviv", name:"텔아비브", country:"이스라엘", flag:"🇮🇱", alias:["tel aviv"] },
+  { key:"amman", name:"암만", country:"요르단", flag:"🇯🇴", alias:["amman","jordan","요르단","petra","페트라"] },
+  { key:"beirut", name:"베이루트", country:"레바논", flag:"🇱🇧", alias:["beirut","lebanon"] },
+  { key:"tehran", name:"테헤란", country:"이란", flag:"🇮🇷", alias:["tehran","iran","이란"] },
+
+  // ===== 유럽 서부 =====
+  { key:"paris", name:"파리", country:"프랑스", flag:"🇫🇷", alias:["paris","프랑스","france"] },
+  { key:"nice", name:"니스", country:"프랑스", flag:"🇫🇷", alias:["nice"] },
+  { key:"marseille", name:"마르세유", country:"프랑스", flag:"🇫🇷", alias:["marseille"] },
+  { key:"lyon", name:"리옹", country:"프랑스", flag:"🇫🇷", alias:["lyon"] },
+  { key:"bordeaux", name:"보르도", country:"프랑스", flag:"🇫🇷", alias:["bordeaux"] },
+  { key:"strasbourg", name:"스트라스부르", country:"프랑스", flag:"🇫🇷", alias:["strasbourg"] },
+  { key:"london", name:"런던", country:"영국", flag:"🇬🇧", alias:["london","영국","uk","england"] },
+  { key:"edinburgh", name:"에든버러", country:"영국", flag:"🇬🇧", alias:["edinburgh"] },
+  { key:"manchester", name:"맨체스터", country:"영국", flag:"🇬🇧", alias:["manchester"] },
+  { key:"liverpool", name:"리버풀", country:"영국", flag:"🇬🇧", alias:["liverpool"] },
+  { key:"oxford", name:"옥스퍼드", country:"영국", flag:"🇬🇧", alias:["oxford"] },
+  { key:"bath", name:"바스", country:"영국", flag:"🇬🇧", alias:["bath"] },
+  { key:"dublin", name:"더블린", country:"아일랜드", flag:"🇮🇪", alias:["dublin","ireland","아일랜드"] },
+  { key:"amsterdam", name:"암스테르담", country:"네덜란드", flag:"🇳🇱", alias:["amsterdam","netherlands","네덜란드"] },
+  { key:"rotterdam", name:"로테르담", country:"네덜란드", flag:"🇳🇱", alias:["rotterdam"] },
+  { key:"brussels", name:"브뤼셀", country:"벨기에", flag:"🇧🇪", alias:["brussels","벨기에","belgium"] },
+  { key:"bruges", name:"브뤼헤", country:"벨기에", flag:"🇧🇪", alias:["bruges","brugge"] },
+  { key:"luxembourg", name:"룩셈부르크", country:"룩셈부르크", flag:"🇱🇺", alias:["luxembourg"] },
+  { key:"berlin", name:"베를린", country:"독일", flag:"🇩🇪", alias:["berlin","독일","germany"] },
+  { key:"munich", name:"뮌헨", country:"독일", flag:"🇩🇪", alias:["munich","münchen"] },
+  { key:"frankfurt", name:"프랑크푸르트", country:"독일", flag:"🇩🇪", alias:["frankfurt"] },
+  { key:"hamburg", name:"함부르크", country:"독일", flag:"🇩🇪", alias:["hamburg"] },
+  { key:"cologne", name:"쾰른", country:"독일", flag:"🇩🇪", alias:["cologne","köln"] },
+  { key:"dresden", name:"드레스덴", country:"독일", flag:"🇩🇪", alias:["dresden"] },
+  { key:"heidelberg", name:"하이델베르크", country:"독일", flag:"🇩🇪", alias:["heidelberg"] },
+  { key:"zurich", name:"취리히", country:"스위스", flag:"🇨🇭", alias:["zurich","zürich","스위스","switzerland"] },
+  { key:"geneva", name:"제네바", country:"스위스", flag:"🇨🇭", alias:["geneva","genève"] },
+  { key:"interlaken", name:"인터라켄", country:"스위스", flag:"🇨🇭", alias:["interlaken"] },
+  { key:"lucerne", name:"루체른", country:"스위스", flag:"🇨🇭", alias:["lucerne","luzern"] },
+  { key:"zermatt", name:"체르마트", country:"스위스", flag:"🇨🇭", alias:["zermatt"] },
+  { key:"vienna", name:"빈", country:"오스트리아", flag:"🇦🇹", alias:["vienna","wien","오스트리아","austria"] },
+  { key:"salzburg", name:"잘츠부르크", country:"오스트리아", flag:"🇦🇹", alias:["salzburg"] },
+  { key:"hallstatt", name:"할슈타트", country:"오스트리아", flag:"🇦🇹", alias:["hallstatt"] },
+  { key:"innsbruck", name:"인스브루크", country:"오스트리아", flag:"🇦🇹", alias:["innsbruck"] },
+  { key:"prague", name:"프라하", country:"체코", flag:"🇨🇿", alias:["prague","praha","체코","czech"] },
+  { key:"ceskykrumlov", name:"체스키크룸로프", country:"체코", flag:"🇨🇿", alias:["cesky krumlov"] },
+
+  // ===== 유럽 남부 =====
+  { key:"rome", name:"로마", country:"이탈리아", flag:"🇮🇹", alias:["rome","roma","이탈리아","italy"] },
+  { key:"florence", name:"피렌체", country:"이탈리아", flag:"🇮🇹", alias:["florence","firenze"] },
+  { key:"venice", name:"베네치아", country:"이탈리아", flag:"🇮🇹", alias:["venice","venezia","베니스"] },
+  { key:"milan", name:"밀라노", country:"이탈리아", flag:"🇮🇹", alias:["milan","milano"] },
+  { key:"naples", name:"나폴리", country:"이탈리아", flag:"🇮🇹", alias:["naples","napoli"] },
+  { key:"sicily", name:"시칠리아", country:"이탈리아", flag:"🇮🇹", alias:["sicily","sicilia","palermo"] },
+  { key:"cinqueterre", name:"친퀘테레", country:"이탈리아", flag:"🇮🇹", alias:["cinque terre"] },
+  { key:"amalfi", name:"아말피", country:"이탈리아", flag:"🇮🇹", alias:["amalfi","positano"] },
+  { key:"verona", name:"베로나", country:"이탈리아", flag:"🇮🇹", alias:["verona"] },
+  { key:"bologna", name:"볼로냐", country:"이탈리아", flag:"🇮🇹", alias:["bologna"] },
+  { key:"madrid", name:"마드리드", country:"스페인", flag:"🇪🇸", alias:["madrid","스페인","spain"] },
+  { key:"barcelona", name:"바르셀로나", country:"스페인", flag:"🇪🇸", alias:["barcelona"] },
+  { key:"seville", name:"세비야", country:"스페인", flag:"🇪🇸", alias:["seville","sevilla"] },
+  { key:"granada", name:"그라나다", country:"스페인", flag:"🇪🇸", alias:["granada"] },
+  { key:"valencia", name:"발렌시아", country:"스페인", flag:"🇪🇸", alias:["valencia"] },
+  { key:"ibiza", name:"이비자", country:"스페인", flag:"🇪🇸", alias:["ibiza"] },
+  { key:"toledo", name:"톨레도", country:"스페인", flag:"🇪🇸", alias:["toledo"] },
+  { key:"bilbao", name:"빌바오", country:"스페인", flag:"🇪🇸", alias:["bilbao"] },
+  { key:"lisbon", name:"리스본", country:"포르투갈", flag:"🇵🇹", alias:["lisbon","lisboa","포르투갈","portugal"] },
+  { key:"porto", name:"포르투", country:"포르투갈", flag:"🇵🇹", alias:["porto"] },
+  { key:"sintra", name:"신트라", country:"포르투갈", flag:"🇵🇹", alias:["sintra"] },
+  { key:"athens", name:"아테네", country:"그리스", flag:"🇬🇷", alias:["athens","그리스","greece"] },
+  { key:"santorini", name:"산토리니", country:"그리스", flag:"🇬🇷", alias:["santorini"] },
+  { key:"mykonos", name:"미코노스", country:"그리스", flag:"🇬🇷", alias:["mykonos"] },
+  { key:"crete", name:"크레타", country:"그리스", flag:"🇬🇷", alias:["crete","heraklion"] },
+  { key:"rhodes", name:"로도스", country:"그리스", flag:"🇬🇷", alias:["rhodes"] },
+  { key:"valletta", name:"발레타", country:"몰타", flag:"🇲🇹", alias:["valletta","malta","몰타"] },
+  { key:"marrakech", name:"마라케시", country:"모로코", flag:"🇲🇦", alias:["marrakech","marrakesh","모로코"] },
+  { key:"casablanca", name:"카사블랑카", country:"모로코", flag:"🇲🇦", alias:["casablanca"] },
+  { key:"fez", name:"페즈", country:"모로코", flag:"🇲🇦", alias:["fez","fes"] },
+  { key:"chefchaouen", name:"쉐프샤우엔", country:"모로코", flag:"🇲🇦", alias:["chefchaouen"] },
+
+  // ===== 북유럽 & 동유럽 =====
+  { key:"copenhagen", name:"코펜하겐", country:"덴마크", flag:"🇩🇰", alias:["copenhagen","덴마크","denmark"] },
+  { key:"stockholm", name:"스톡홀름", country:"스웨덴", flag:"🇸🇪", alias:["stockholm","스웨덴","sweden"] },
+  { key:"gothenburg", name:"예테보리", country:"스웨덴", flag:"🇸🇪", alias:["gothenburg"] },
+  { key:"oslo", name:"오슬로", country:"노르웨이", flag:"🇳🇴", alias:["oslo","노르웨이","norway"] },
+  { key:"bergen", name:"베르겐", country:"노르웨이", flag:"🇳🇴", alias:["bergen"] },
+  { key:"tromso", name:"트롬쇠", country:"노르웨이", flag:"🇳🇴", alias:["tromso","오로라"] },
+  { key:"helsinki", name:"헬싱키", country:"핀란드", flag:"🇫🇮", alias:["helsinki","핀란드","finland"] },
+  { key:"rovaniemi", name:"로바니에미", country:"핀란드", flag:"🇫🇮", alias:["rovaniemi","산타","lapland"] },
+  { key:"reykjavik", name:"레이캬비크", country:"아이슬란드", flag:"🇮🇸", alias:["reykjavik","iceland","아이슬란드"] },
+  { key:"warsaw", name:"바르샤바", country:"폴란드", flag:"🇵🇱", alias:["warsaw","폴란드","poland"] },
+  { key:"krakow", name:"크라쿠프", country:"폴란드", flag:"🇵🇱", alias:["krakow","kraków"] },
+  { key:"gdansk", name:"그단스크", country:"폴란드", flag:"🇵🇱", alias:["gdansk"] },
+  { key:"budapest", name:"부다페스트", country:"헝가리", flag:"🇭🇺", alias:["budapest","헝가리","hungary"] },
+  { key:"bratislava", name:"브라티슬라바", country:"슬로바키아", flag:"🇸🇰", alias:["bratislava","slovakia"] },
+  { key:"ljubljana", name:"류블랴나", country:"슬로베니아", flag:"🇸🇮", alias:["ljubljana","slovenia"] },
+  { key:"zagreb", name:"자그레브", country:"크로아티아", flag:"🇭🇷", alias:["zagreb","크로아티아","croatia"] },
+  { key:"dubrovnik", name:"두브로브니크", country:"크로아티아", flag:"🇭🇷", alias:["dubrovnik"] },
+  { key:"split", name:"스플리트", country:"크로아티아", flag:"🇭🇷", alias:["split"] },
+  { key:"belgrade", name:"베오그라드", country:"세르비아", flag:"🇷🇸", alias:["belgrade","serbia"] },
+  { key:"sarajevo", name:"사라예보", country:"보스니아", flag:"🇧🇦", alias:["sarajevo","bosnia"] },
+  { key:"sofia", name:"소피아", country:"불가리아", flag:"🇧🇬", alias:["sofia","bulgaria"] },
+  { key:"bucharest", name:"부쿠레슈티", country:"루마니아", flag:"🇷🇴", alias:["bucharest","romania"] },
+  { key:"tallinn", name:"탈린", country:"에스토니아", flag:"🇪🇪", alias:["tallinn","estonia"] },
+  { key:"riga", name:"리가", country:"라트비아", flag:"🇱🇻", alias:["riga","latvia"] },
+  { key:"vilnius", name:"빌뉴스", country:"리투아니아", flag:"🇱🇹", alias:["vilnius","lithuania"] },
+  { key:"moscow", name:"모스크바", country:"러시아", flag:"🇷🇺", alias:["moscow","москва","러시아","russia"] },
+  { key:"petersburg", name:"상트페테르부르크", country:"러시아", flag:"🇷🇺", alias:["saint petersburg","st petersburg"] },
+  { key:"vladivostok", name:"블라디보스토크", country:"러시아", flag:"🇷🇺", alias:["vladivostok"] },
+  { key:"kyiv", name:"키이우", country:"우크라이나", flag:"🇺🇦", alias:["kyiv","kiev","ukraine"] },
+
+  // ===== 북미 =====
+  { key:"newyork", name:"뉴욕", country:"미국", flag:"🇺🇸", alias:["new york","nyc","미국","usa","america"] },
+  { key:"la", name:"로스앤젤레스", country:"미국", flag:"🇺🇸", alias:["los angeles","la","엘에이"] },
+  { key:"sanfrancisco", name:"샌프란시스코", country:"미국", flag:"🇺🇸", alias:["san francisco","sf"] },
+  { key:"chicago", name:"시카고", country:"미국", flag:"🇺🇸", alias:["chicago"] },
+  { key:"lasvegas", name:"라스베이거스", country:"미국", flag:"🇺🇸", alias:["las vegas","vegas"] },
+  { key:"miami", name:"마이애미", country:"미국", flag:"🇺🇸", alias:["miami"] },
+  { key:"washingtondc", name:"워싱턴 D.C.", country:"미국", flag:"🇺🇸", alias:["washington","dc"] },
+  { key:"boston", name:"보스턴", country:"미국", flag:"🇺🇸", alias:["boston"] },
+  { key:"seattle", name:"시애틀", country:"미국", flag:"🇺🇸", alias:["seattle"] },
+  { key:"portland", name:"포틀랜드", country:"미국", flag:"🇺🇸", alias:["portland"] },
+  { key:"honolulu", name:"호놀룰루", country:"미국", flag:"🇺🇸", alias:["honolulu","하와이","hawaii"] },
+  { key:"orlando", name:"올랜도", country:"미국", flag:"🇺🇸", alias:["orlando","disneyworld"] },
+  { key:"neworleans", name:"뉴올리언스", country:"미국", flag:"🇺🇸", alias:["new orleans"] },
+  { key:"nashville", name:"내슈빌", country:"미국", flag:"🇺🇸", alias:["nashville"] },
+  { key:"austin", name:"오스틴", country:"미국", flag:"🇺🇸", alias:["austin"] },
+  { key:"sandiego", name:"샌디에이고", country:"미국", flag:"🇺🇸", alias:["san diego"] },
+  { key:"philadelphia", name:"필라델피아", country:"미국", flag:"🇺🇸", alias:["philadelphia","philly"] },
+  { key:"denver", name:"덴버", country:"미국", flag:"🇺🇸", alias:["denver"] },
+  { key:"salt", name:"솔트레이크시티", country:"미국", flag:"🇺🇸", alias:["salt lake city"] },
+  { key:"anchorage", name:"앵커리지", country:"미국", flag:"🇺🇸", alias:["anchorage","알래스카","alaska"] },
+  { key:"toronto", name:"토론토", country:"캐나다", flag:"🇨🇦", alias:["toronto","캐나다","canada"] },
+  { key:"vancouver", name:"밴쿠버", country:"캐나다", flag:"🇨🇦", alias:["vancouver"] },
+  { key:"montreal", name:"몬트리올", country:"캐나다", flag:"🇨🇦", alias:["montreal","montréal"] },
+  { key:"quebec", name:"퀘벡", country:"캐나다", flag:"🇨🇦", alias:["quebec"] },
+  { key:"banff", name:"밴프", country:"캐나다", flag:"🇨🇦", alias:["banff"] },
+  { key:"niagara", name:"나이아가라", country:"캐나다", flag:"🇨🇦", alias:["niagara"] },
+  { key:"mexicocity", name:"멕시코시티", country:"멕시코", flag:"🇲🇽", alias:["mexico city","ciudad","멕시코","mexico"] },
+  { key:"cancun", name:"칸쿤", country:"멕시코", flag:"🇲🇽", alias:["cancun"] },
+  { key:"playadelcarmen", name:"플라야델카르멘", country:"멕시코", flag:"🇲🇽", alias:["playa del carmen"] },
+  { key:"tulum", name:"툴룸", country:"멕시코", flag:"🇲🇽", alias:["tulum"] },
+  { key:"oaxaca", name:"오아하카", country:"멕시코", flag:"🇲🇽", alias:["oaxaca"] },
+
+  // ===== 중남미 =====
+  { key:"havana", name:"아바나", country:"쿠바", flag:"🇨🇺", alias:["havana","habana","cuba","쿠바"] },
+  { key:"sanjose", name:"산호세", country:"코스타리카", flag:"🇨🇷", alias:["san jose","costa rica"] },
+  { key:"panamacity", name:"파나마시티", country:"파나마", flag:"🇵🇦", alias:["panama city","panama","파나마"] },
+  { key:"lima", name:"리마", country:"페루", flag:"🇵🇪", alias:["lima","peru","페루"] },
+  { key:"cusco", name:"쿠스코", country:"페루", flag:"🇵🇪", alias:["cusco","cuzco","마추픽추","machu picchu"] },
+  { key:"lapaz", name:"라파스", country:"볼리비아", flag:"🇧🇴", alias:["la paz","bolivia","우유니","uyuni"] },
+  { key:"santiago", name:"산티아고", country:"칠레", flag:"🇨🇱", alias:["santiago","chile","칠레"] },
+  { key:"easterisland", name:"이스터섬", country:"칠레", flag:"🇨🇱", alias:["easter island","rapa nui"] },
+  { key:"buenosaires", name:"부에노스아이레스", country:"아르헨티나", flag:"🇦🇷", alias:["buenos aires","argentina","아르헨티나"] },
+  { key:"patagonia", name:"파타고니아", country:"아르헨티나", flag:"🇦🇷", alias:["patagonia","el calafate"] },
+  { key:"iguazu", name:"이구아수", country:"브라질", flag:"🇧🇷", alias:["iguazu","iguaçu"] },
+  { key:"rio", name:"리우데자네이루", country:"브라질", flag:"🇧🇷", alias:["rio","rio de janeiro","brazil","브라질"] },
+  { key:"saopaulo", name:"상파울루", country:"브라질", flag:"🇧🇷", alias:["sao paulo","são paulo"] },
+  { key:"salvador", name:"살바도르", country:"브라질", flag:"🇧🇷", alias:["salvador","bahia"] },
+  { key:"quito", name:"키토", country:"에콰도르", flag:"🇪🇨", alias:["quito","ecuador","갈라파고스","galapagos"] },
+  { key:"bogota", name:"보고타", country:"콜롬비아", flag:"🇨🇴", alias:["bogota","colombia","콜롬비아"] },
+  { key:"cartagena", name:"카르타헤나", country:"콜롬비아", flag:"🇨🇴", alias:["cartagena"] },
+  { key:"montevideo", name:"몬테비데오", country:"우루과이", flag:"🇺🇾", alias:["montevideo","uruguay"] },
+
+  // ===== 아프리카 =====
+  { key:"cairo", name:"카이로", country:"이집트", flag:"🇪🇬", alias:["cairo","egypt","이집트"] },
+  { key:"luxor", name:"룩소르", country:"이집트", flag:"🇪🇬", alias:["luxor"] },
+  { key:"alexandria", name:"알렉산드리아", country:"이집트", flag:"🇪🇬", alias:["alexandria"] },
+  { key:"capetown", name:"케이프타운", country:"남아공", flag:"🇿🇦", alias:["cape town","south africa","남아프리카"] },
+  { key:"johannesburg", name:"요하네스버그", country:"남아공", flag:"🇿🇦", alias:["johannesburg","joburg"] },
+  { key:"victoriafalls", name:"빅토리아폭포", country:"잠비아", flag:"🇿🇲", alias:["victoria falls","zambia"] },
+  { key:"nairobi", name:"나이로비", country:"케냐", flag:"🇰🇪", alias:["nairobi","kenya","케냐"] },
+  { key:"masaimara", name:"마사이마라", country:"케냐", flag:"🇰🇪", alias:["masai mara","사파리","safari"] },
+  { key:"zanzibar", name:"잔지바르", country:"탄자니아", flag:"🇹🇿", alias:["zanzibar","tanzania"] },
+  { key:"addisababa", name:"아디스아바바", country:"에티오피아", flag:"🇪🇹", alias:["addis ababa","ethiopia"] },
+  { key:"lagos", name:"라고스", country:"나이지리아", flag:"🇳🇬", alias:["lagos","nigeria"] },
+  { key:"tunis", name:"튀니스", country:"튀니지", flag:"🇹🇳", alias:["tunis","tunisia"] },
+  { key:"mauritius", name:"모리셔스", country:"모리셔스", flag:"🇲🇺", alias:["mauritius"] },
+  { key:"seychelles", name:"세이셸", country:"세이셸", flag:"🇸🇨", alias:["seychelles"] },
+
+  // ===== 오세아니아 =====
+  { key:"sydney", name:"시드니", country:"호주", flag:"🇦🇺", alias:["sydney","호주","australia"] },
+  { key:"melbourne", name:"멜버른", country:"호주", flag:"🇦🇺", alias:["melbourne"] },
+  { key:"brisbane", name:"브리즈번", country:"호주", flag:"🇦🇺", alias:["brisbane"] },
+  { key:"goldcoast", name:"골드코스트", country:"호주", flag:"🇦🇺", alias:["gold coast"] },
+  { key:"cairns", name:"케언스", country:"호주", flag:"🇦🇺", alias:["cairns","great barrier reef"] },
+  { key:"perth", name:"퍼스", country:"호주", flag:"🇦🇺", alias:["perth"] },
+  { key:"adelaide", name:"애들레이드", country:"호주", flag:"🇦🇺", alias:["adelaide"] },
+  { key:"tasmania", name:"태즈메이니아", country:"호주", flag:"🇦🇺", alias:["tasmania","hobart"] },
+  { key:"uluru", name:"울루루", country:"호주", flag:"🇦🇺", alias:["uluru","ayers rock"] },
+  { key:"auckland", name:"오클랜드", country:"뉴질랜드", flag:"🇳🇿", alias:["auckland","뉴질랜드","new zealand"] },
+  { key:"queenstown", name:"퀸스타운", country:"뉴질랜드", flag:"🇳🇿", alias:["queenstown"] },
+  { key:"wellington", name:"웰링턴", country:"뉴질랜드", flag:"🇳🇿", alias:["wellington"] },
+  { key:"rotorua", name:"로토루아", country:"뉴질랜드", flag:"🇳🇿", alias:["rotorua"] },
+  { key:"christchurch", name:"크라이스트처치", country:"뉴질랜드", flag:"🇳🇿", alias:["christchurch"] },
+  { key:"nadi", name:"나디", country:"피지", flag:"🇫🇯", alias:["nadi","fiji","피지"] },
+  { key:"guam", name:"괌", country:"괌", flag:"🇬🇺", alias:["guam"] },
+  { key:"saipan", name:"사이판", country:"북마리아나", flag:"🇲🇵", alias:["saipan"] },
+  { key:"papeete", name:"파페에테", country:"타히티", flag:"🇵🇫", alias:["papeete","tahiti","타히티","보라보라","bora bora"] },
+
+  // ===== 추가 도시: 한국 보강 =====
+  { key:"sokcho", name:"속초", country:"대한민국", flag:"🇰🇷", alias:["sokcho","설악산"] },
+  { key:"gangneung", name:"강릉", country:"대한민국", flag:"🇰🇷", alias:["gangneung"] },
+  { key:"yangyang", name:"양양", country:"대한민국", flag:"🇰🇷", alias:["yangyang"] },
+  { key:"chuncheon", name:"춘천", country:"대한민국", flag:"🇰🇷", alias:["chuncheon"] },
+  { key:"andong", name:"안동", country:"대한민국", flag:"🇰🇷", alias:["andong","하회마을"] },
+  { key:"pohang", name:"포항", country:"대한민국", flag:"🇰🇷", alias:["pohang"] },
+  { key:"tongyeong", name:"통영", country:"대한민국", flag:"🇰🇷", alias:["tongyeong"] },
+  { key:"namhae", name:"남해", country:"대한민국", flag:"🇰🇷", alias:["namhae"] },
+  { key:"suncheon", name:"순천", country:"대한민국", flag:"🇰🇷", alias:["suncheon"] },
+  { key:"yeosu", name:"여수", country:"대한민국", flag:"🇰🇷", alias:["yeosu"] },
+  { key:"mokpo", name:"목포", country:"대한민국", flag:"🇰🇷", alias:["mokpo"] },
+  { key:"ulleungdo", name:"울릉도", country:"대한민국", flag:"🇰🇷", alias:["ulleungdo","독도"] },
+
+  // ===== 추가 도시: 일본 보강 =====
+  { key:"nagasaki", name:"나가사키", country:"일본", flag:"🇯🇵", alias:["nagasaki"] },
+  { key:"kumamoto", name:"구마모토", country:"일본", flag:"🇯🇵", alias:["kumamoto"] },
+  { key:"kagoshima", name:"가고시마", country:"일본", flag:"🇯🇵", alias:["kagoshima"] },
+  { key:"matsumoto", name:"마쓰모토", country:"일본", flag:"🇯🇵", alias:["matsumoto","matsu"] },
+  { key:"kanazawa", name:"가나자와", country:"일본", flag:"🇯🇵", alias:["kanazawa"] },
+  { key:"takayama", name:"다카야마", country:"일본", flag:"🇯🇵", alias:["takayama"] },
+  { key:"shirakawago", name:"시라카와고", country:"일본", flag:"🇯🇵", alias:["shirakawago"] },
+  { key:"nikko", name:"닛코", country:"일본", flag:"🇯🇵", alias:["nikko"] },
+  { key:"miyajima", name:"미야지마", country:"일본", flag:"🇯🇵", alias:["miyajima","itsukushima"] },
+  { key:"yakushima", name:"야쿠시마", country:"일본", flag:"🇯🇵", alias:["yakushima"] },
+  { key:"izu", name:"이즈", country:"일본", flag:"🇯🇵", alias:["izu","아타미","atami"] },
+  { key:"toyama", name:"도야마", country:"일본", flag:"🇯🇵", alias:["toyama"] },
+
+  // ===== 추가 도시: 중국·대만 =====
+  { key:"xian", name:"시안", country:"중국", flag:"🇨🇳", alias:["xian","xi'an","병마용"] },
+  { key:"guilin", name:"구이린", country:"중국", flag:"🇨🇳", alias:["guilin","계림"] },
+  { key:"hangzhou", name:"항저우", country:"중국", flag:"🇨🇳", alias:["hangzhou","서호"] },
+  { key:"suzhou", name:"쑤저우", country:"중국", flag:"🇨🇳", alias:["suzhou"] },
+  { key:"qingdao", name:"칭다오", country:"중국", flag:"🇨🇳", alias:["qingdao"] },
+  { key:"chongqing", name:"충칭", country:"중국", flag:"🇨🇳", alias:["chongqing"] },
+  { key:"zhangjiajie", name:"장자제", country:"중국", flag:"🇨🇳", alias:["zhangjiajie","장가계"] },
+  { key:"lhasa", name:"라싸", country:"중국", flag:"🇨🇳", alias:["lhasa","tibet","티벳"] },
+  { key:"sanya", name:"싼야", country:"중국", flag:"🇨🇳", alias:["sanya","하이난"] },
+  { key:"kaohsiung", name:"가오슝", country:"대만", flag:"🇹🇼", alias:["kaohsiung"] },
+  { key:"taichung", name:"타이중", country:"대만", flag:"🇹🇼", alias:["taichung"] },
+  { key:"tainan", name:"타이난", country:"대만", flag:"🇹🇼", alias:["tainan"] },
+  { key:"hualien", name:"화롄", country:"대만", flag:"🇹🇼", alias:["hualien","태로각"] },
+
+  // ===== 추가 도시: 동남아 보강 =====
+  { key:"phukets", name:"푸켓 (라차)", country:"태국", flag:"🇹🇭", alias:["racha","라차"] },
+  { key:"krabi", name:"끄라비", country:"태국", flag:"🇹🇭", alias:["krabi"] },
+  { key:"kohsamui", name:"코사무이", country:"태국", flag:"🇹🇭", alias:["koh samui","사무이"] },
+  { key:"kohphangan", name:"코팡안", country:"태국", flag:"🇹🇭", alias:["koh phangan"] },
+  { key:"ayutthaya", name:"아유타야", country:"태국", flag:"🇹🇭", alias:["ayutthaya"] },
+  { key:"sukhothai", name:"수코타이", country:"태국", flag:"🇹🇭", alias:["sukhothai"] },
+  { key:"hochiminhdistrict", name:"호이안", country:"베트남", flag:"🇻🇳", alias:["hoian","hoi an"] },
+  { key:"vungtau", name:"붕따우", country:"베트남", flag:"🇻🇳", alias:["vung tau"] },
+  { key:"dalat", name:"달랏", country:"베트남", flag:"🇻🇳", alias:["dalat","da lat"] },
+  { key:"sapa", name:"사파", country:"베트남", flag:"🇻🇳", alias:["sapa","사빠"] },
+  { key:"siemreap", name:"시엠립", country:"캄보디아", flag:"🇰🇭", alias:["siem reap","앙코르","angkor"] },
+  { key:"vientiane", name:"비엔티안", country:"라오스", flag:"🇱🇦", alias:["vientiane"] },
+  { key:"luangprabang", name:"루앙프라방", country:"라오스", flag:"🇱🇦", alias:["luang prabang"] },
+  { key:"bagan", name:"바간", country:"미얀마", flag:"🇲🇲", alias:["bagan"] },
+  { key:"mandalay", name:"만달레이", country:"미얀마", flag:"🇲🇲", alias:["mandalay"] },
+  { key:"penang", name:"페낭", country:"말레이시아", flag:"🇲🇾", alias:["penang","조지타운","george town"] },
+  { key:"langkawi", name:"랑카위", country:"말레이시아", flag:"🇲🇾", alias:["langkawi"] },
+  { key:"kotakinabalu", name:"코타키나발루", country:"말레이시아", flag:"🇲🇾", alias:["kota kinabalu","kk"] },
+  { key:"yogyakarta", name:"족자카르타", country:"인도네시아", flag:"🇮🇩", alias:["yogyakarta","jogja","보로부두르"] },
+  { key:"lombok", name:"롬복", country:"인도네시아", flag:"🇮🇩", alias:["lombok","길리","gili"] },
+  { key:"cebu", name:"세부", country:"필리핀", flag:"🇵🇭", alias:["cebu"] },
+  { key:"boracay", name:"보라카이", country:"필리핀", flag:"🇵🇭", alias:["boracay"] },
+  { key:"palawan", name:"팔라완", country:"필리핀", flag:"🇵🇭", alias:["palawan","el nido","엘니도"] },
+
+  // ===== 추가 도시: 인도·중동 =====
+  { key:"jaipur", name:"자이푸르", country:"인도", flag:"🇮🇳", alias:["jaipur"] },
+  { key:"varanasi", name:"바라나시", country:"인도", flag:"🇮🇳", alias:["varanasi"] },
+  { key:"goa", name:"고아", country:"인도", flag:"🇮🇳", alias:["goa"] },
+  { key:"kerala", name:"케랄라", country:"인도", flag:"🇮🇳", alias:["kerala","코친","cochin"] },
+  { key:"kathmandu", name:"카트만두", country:"네팔", flag:"🇳🇵", alias:["kathmandu","포카라"] },
+  { key:"thimphu", name:"팀푸", country:"부탄", flag:"🇧🇹", alias:["thimphu","bhutan"] },
+  { key:"colombo", name:"콜롬보", country:"스리랑카", flag:"🇱🇰", alias:["colombo"] },
+  { key:"male", name:"말레", country:"몰디브", flag:"🇲🇻", alias:["male","maldives","몰디브"] },
+  { key:"abudhabi", name:"아부다비", country:"UAE", flag:"🇦🇪", alias:["abu dhabi"] },
+  { key:"muscat", name:"무스카트", country:"오만", flag:"🇴🇲", alias:["muscat","oman"] },
+  { key:"riyadh", name:"리야드", country:"사우디아라비아", flag:"🇸🇦", alias:["riyadh"] },
+  { key:"baku", name:"바쿠", country:"아제르바이잔", flag:"🇦🇿", alias:["baku"] },
+  { key:"tbilisi", name:"트빌리시", country:"조지아", flag:"🇬🇪", alias:["tbilisi","georgia"] },
+  { key:"yerevan", name:"예레반", country:"아르메니아", flag:"🇦🇲", alias:["yerevan"] },
+
+  // ===== 추가 도시: 유럽 보강 =====
+  { key:"lyon", name:"리옹", country:"프랑스", flag:"🇫🇷", alias:["lyon"] },
+  { key:"bordeaux", name:"보르도", country:"프랑스", flag:"🇫🇷", alias:["bordeaux"] },
+  { key:"strasbourg", name:"스트라스부르", country:"프랑스", flag:"🇫🇷", alias:["strasbourg"] },
+  { key:"toulouse", name:"툴루즈", country:"프랑스", flag:"🇫🇷", alias:["toulouse"] },
+  { key:"hamburg", name:"함부르크", country:"독일", flag:"🇩🇪", alias:["hamburg"] },
+  { key:"frankfurt", name:"프랑크푸르트", country:"독일", flag:"🇩🇪", alias:["frankfurt"] },
+  { key:"dresden", name:"드레스덴", country:"독일", flag:"🇩🇪", alias:["dresden"] },
+  { key:"cologne", name:"쾰른", country:"독일", flag:"🇩🇪", alias:["cologne","koln"] },
+  { key:"manchester", name:"맨체스터", country:"영국", flag:"🇬🇧", alias:["manchester"] },
+  { key:"liverpool", name:"리버풀", country:"영국", flag:"🇬🇧", alias:["liverpool"] },
+  { key:"bath", name:"바스", country:"영국", flag:"🇬🇧", alias:["bath"] },
+  { key:"oxford", name:"옥스퍼드", country:"영국", flag:"🇬🇧", alias:["oxford"] },
+  { key:"cambridge", name:"케임브리지", country:"영국", flag:"🇬🇧", alias:["cambridge"] },
+  { key:"galway", name:"골웨이", country:"아일랜드", flag:"🇮🇪", alias:["galway"] },
+  { key:"verona", name:"베로나", country:"이탈리아", flag:"🇮🇹", alias:["verona"] },
+  { key:"naples", name:"나폴리", country:"이탈리아", flag:"🇮🇹", alias:["naples","napoli"] },
+  { key:"capri", name:"카프리", country:"이탈리아", flag:"🇮🇹", alias:["capri"] },
+  { key:"amalfi", name:"아말피", country:"이탈리아", flag:"🇮🇹", alias:["amalfi","positano"] },
+  { key:"sicily", name:"시칠리아", country:"이탈리아", flag:"🇮🇹", alias:["sicily","sicilia","palermo","catania"] },
+  { key:"valencia", name:"발렌시아", country:"스페인", flag:"🇪🇸", alias:["valencia"] },
+  { key:"sevilla", name:"세비야", country:"스페인", flag:"🇪🇸", alias:["sevilla","seville"] },
+  { key:"granada", name:"그라나다", country:"스페인", flag:"🇪🇸", alias:["granada"] },
+  { key:"toledo", name:"톨레도", country:"스페인", flag:"🇪🇸", alias:["toledo"] },
+  { key:"bilbao", name:"빌바오", country:"스페인", flag:"🇪🇸", alias:["bilbao"] },
+  { key:"sanSebastian", name:"산세바스티안", country:"스페인", flag:"🇪🇸", alias:["san sebastian"] },
+  { key:"porto", name:"포르투", country:"포르투갈", flag:"🇵🇹", alias:["porto"] },
+  { key:"madeira", name:"마데이라", country:"포르투갈", flag:"🇵🇹", alias:["madeira","funchal"] },
+  { key:"krakow", name:"크라쿠프", country:"폴란드", flag:"🇵🇱", alias:["krakow","cracow"] },
+  { key:"warsaw", name:"바르샤바", country:"폴란드", flag:"🇵🇱", alias:["warsaw","warszawa"] },
+  { key:"bucharest", name:"부쿠레슈티", country:"루마니아", flag:"🇷🇴", alias:["bucharest"] },
+  { key:"sofia", name:"소피아", country:"불가리아", flag:"🇧🇬", alias:["sofia"] },
+  { key:"belgrade", name:"베오그라드", country:"세르비아", flag:"🇷🇸", alias:["belgrade"] },
+  { key:"zagreb", name:"자그레브", country:"크로아티아", flag:"🇭🇷", alias:["zagreb"] },
+  { key:"split", name:"스플리트", country:"크로아티아", flag:"🇭🇷", alias:["split"] },
+  { key:"ljubljana", name:"류블랴나", country:"슬로베니아", flag:"🇸🇮", alias:["ljubljana"] },
+  { key:"tallinn", name:"탈린", country:"에스토니아", flag:"🇪🇪", alias:["tallinn"] },
+  { key:"riga", name:"리가", country:"라트비아", flag:"🇱🇻", alias:["riga"] },
+  { key:"vilnius", name:"빌뉴스", country:"리투아니아", flag:"🇱🇹", alias:["vilnius"] },
+  { key:"bergen", name:"베르겐", country:"노르웨이", flag:"🇳🇴", alias:["bergen"] },
+  { key:"tromso", name:"트롬쇠", country:"노르웨이", flag:"🇳🇴", alias:["tromso"] },
+  { key:"gothenburg", name:"예테보리", country:"스웨덴", flag:"🇸🇪", alias:["gothenburg","goteborg"] },
+  { key:"malmo", name:"말뫼", country:"스웨덴", flag:"🇸🇪", alias:["malmo"] },
+  { key:"aarhus", name:"오르후스", country:"덴마크", flag:"🇩🇰", alias:["aarhus"] },
+  { key:"luxembourg", name:"룩셈부르크", country:"룩셈부르크", flag:"🇱🇺", alias:["luxembourg"] },
+  { key:"bruges", name:"브뤼주", country:"벨기에", flag:"🇧🇪", alias:["bruges","brugge"] },
+  { key:"antwerp", name:"안트베르펜", country:"벨기에", flag:"🇧🇪", alias:["antwerp","antwerpen"] },
+  { key:"ghent", name:"헨트", country:"벨기에", flag:"🇧🇪", alias:["ghent","gent"] },
+  { key:"rotterdam", name:"로테르담", country:"네덜란드", flag:"🇳🇱", alias:["rotterdam"] },
+  { key:"utrecht", name:"위트레흐트", country:"네덜란드", flag:"🇳🇱", alias:["utrecht"] },
+  { key:"geneva", name:"제네바", country:"스위스", flag:"🇨🇭", alias:["geneva"] },
+  { key:"lucerne", name:"루체른", country:"스위스", flag:"🇨🇭", alias:["lucerne","luzern"] },
+  { key:"zermatt", name:"체르마트", country:"스위스", flag:"🇨🇭", alias:["zermatt","matterhorn"] },
+  { key:"interlaken", name:"인터라켄", country:"스위스", flag:"🇨🇭", alias:["interlaken","jungfrau","융프라우"] },
+  { key:"salzburg", name:"잘츠부르크", country:"오스트리아", flag:"🇦🇹", alias:["salzburg"] },
+  { key:"hallstatt", name:"할슈타트", country:"오스트리아", flag:"🇦🇹", alias:["hallstatt"] },
+  { key:"corfu", name:"코르푸", country:"그리스", flag:"🇬🇷", alias:["corfu"] },
+  { key:"mykonos", name:"미코노스", country:"그리스", flag:"🇬🇷", alias:["mykonos"] },
+  { key:"crete", name:"크레타", country:"그리스", flag:"🇬🇷", alias:["crete","heraklion","이라클리온"] },
+  { key:"valletta", name:"발레타", country:"몰타", flag:"🇲🇹", alias:["valletta","malta"] },
+  { key:"cappadocia", name:"카파도키아", country:"튀르키예", flag:"🇹🇷", alias:["cappadocia","goreme","괴레메"] },
+  { key:"antalya", name:"안탈리아", country:"튀르키예", flag:"🇹🇷", alias:["antalya"] },
+  { key:"izmir", name:"이즈미르", country:"튀르키예", flag:"🇹🇷", alias:["izmir","에페소"] },
+
+  // ===== 추가 도시: 북·중·남미 =====
+  { key:"toronto", name:"토론토", country:"캐나다", flag:"🇨🇦", alias:["toronto"] },
+  { key:"montreal", name:"몬트리올", country:"캐나다", flag:"🇨🇦", alias:["montreal"] },
+  { key:"quebec", name:"퀘벡", country:"캐나다", flag:"🇨🇦", alias:["quebec"] },
+  { key:"vancouver2", name:"빅토리아", country:"캐나다", flag:"🇨🇦", alias:["victoria"] },
+  { key:"banff", name:"밴프", country:"캐나다", flag:"🇨🇦", alias:["banff"] },
+  { key:"calgary", name:"캘거리", country:"캐나다", flag:"🇨🇦", alias:["calgary"] },
+  { key:"washingtondc", name:"워싱턴 DC", country:"미국", flag:"🇺🇸", alias:["washington","dc"] },
+  { key:"philadelphia", name:"필라델피아", country:"미국", flag:"🇺🇸", alias:["philadelphia"] },
+  { key:"newOrleans", name:"뉴올리언스", country:"미국", flag:"🇺🇸", alias:["new orleans"] },
+  { key:"sandiego", name:"샌디에이고", country:"미국", flag:"🇺🇸", alias:["san diego"] },
+  { key:"austin", name:"오스틴", country:"미국", flag:"🇺🇸", alias:["austin"] },
+  { key:"dallas", name:"댈러스", country:"미국", flag:"🇺🇸", alias:["dallas"] },
+  { key:"nashville", name:"내슈빌", country:"미국", flag:"🇺🇸", alias:["nashville"] },
+  { key:"denver", name:"덴버", country:"미국", flag:"🇺🇸", alias:["denver"] },
+  { key:"saltLake", name:"솔트레이크 시티", country:"미국", flag:"🇺🇸", alias:["salt lake city"] },
+  { key:"anchorage", name:"앵커리지", country:"미국", flag:"🇺🇸", alias:["anchorage","alaska","알래스카"] },
+  { key:"oahu", name:"호놀룰루(오아후)", country:"미국", flag:"🇺🇸", alias:["oahu","waikiki"] },
+  { key:"maui", name:"마우이", country:"미국", flag:"🇺🇸", alias:["maui"] },
+  { key:"guadalajara", name:"과달라하라", country:"멕시코", flag:"🇲🇽", alias:["guadalajara"] },
+  { key:"tulum", name:"툴룸", country:"멕시코", flag:"🇲🇽", alias:["tulum","playa del carmen"] },
+  { key:"oaxaca", name:"오악사카", country:"멕시코", flag:"🇲🇽", alias:["oaxaca"] },
+  { key:"sanjose", name:"산호세", country:"코스타리카", flag:"🇨🇷", alias:["san jose","costa rica"] },
+  { key:"panamacity", name:"파나마시티", country:"파나마", flag:"🇵🇦", alias:["panama city"] },
+  { key:"havana", name:"아바나", country:"쿠바", flag:"🇨🇺", alias:["havana","habana"] },
+  { key:"cartagena", name:"카르타헤나", country:"콜롬비아", flag:"🇨🇴", alias:["cartagena"] },
+  { key:"medellin", name:"메데인", country:"콜롬비아", flag:"🇨🇴", alias:["medellin"] },
+  { key:"bogota", name:"보고타", country:"콜롬비아", flag:"🇨🇴", alias:["bogota"] },
+  { key:"quito", name:"키토", country:"에콰도르", flag:"🇪🇨", alias:["quito","갈라파고스"] },
+  { key:"lima", name:"리마", country:"페루", flag:"🇵🇪", alias:["lima"] },
+  { key:"cusco", name:"쿠스코", country:"페루", flag:"🇵🇪", alias:["cusco","machu picchu","마추픽추"] },
+  { key:"lapaz", name:"라파스", country:"볼리비아", flag:"🇧🇴", alias:["la paz","우유니","uyuni"] },
+  { key:"santiago", name:"산티아고", country:"칠레", flag:"🇨🇱", alias:["santiago"] },
+  { key:"valparaiso", name:"발파라이소", country:"칠레", flag:"🇨🇱", alias:["valparaiso"] },
+  { key:"saopaulo", name:"상파울루", country:"브라질", flag:"🇧🇷", alias:["sao paulo"] },
+  { key:"foz", name:"포스두이구아수", country:"브라질", flag:"🇧🇷", alias:["foz","iguacu","이구아수"] },
+  { key:"montevideo", name:"몬테비데오", country:"우루과이", flag:"🇺🇾", alias:["montevideo"] },
+
+  // ===== 추가 도시: 아프리카 =====
+  { key:"casablanca", name:"카사블랑카", country:"모로코", flag:"🇲🇦", alias:["casablanca"] },
+  { key:"fes", name:"페즈", country:"모로코", flag:"🇲🇦", alias:["fes","fez"] },
+  { key:"tunis", name:"튀니스", country:"튀니지", flag:"🇹🇳", alias:["tunis","tunisia"] },
+  { key:"nairobi", name:"나이로비", country:"케냐", flag:"🇰🇪", alias:["nairobi","kenya","케냐"] },
+  { key:"zanzibar", name:"잔지바르", country:"탄자니아", flag:"🇹🇿", alias:["zanzibar","tanzania"] },
+  { key:"kigali", name:"키갈리", country:"르완다", flag:"🇷🇼", alias:["kigali"] },
+  { key:"victoriafalls", name:"빅토리아 폭포", country:"잠비아/짐바브웨", flag:"🇿🇼", alias:["victoria falls","빅폭"] },
+  { key:"johannesburg", name:"요하네스버그", country:"남아공", flag:"🇿🇦", alias:["johannesburg"] },
+  { key:"windhoek", name:"빈트후크", country:"나미비아", flag:"🇳🇦", alias:["windhoek","namibia"] },
+  { key:"addis", name:"아디스아바바", country:"에티오피아", flag:"🇪🇹", alias:["addis ababa","ethiopia"] },
+
+  // ===== 추가 도시: 대양주 =====
+  { key:"darwin", name:"다윈", country:"호주", flag:"🇦🇺", alias:["darwin"] },
+  { key:"newcastle", name:"뉴캐슬", country:"호주", flag:"🇦🇺", alias:["newcastle"] },
+  { key:"queenstownAU", name:"애들레이드 힐스", country:"호주", flag:"🇦🇺", alias:["adelaide hills","바로사"] },
+  { key:"dunedin", name:"더니든", country:"뉴질랜드", flag:"🇳🇿", alias:["dunedin"] },
+  { key:"taupo", name:"타우포", country:"뉴질랜드", flag:"🇳🇿", alias:["taupo"] },
+  { key:"port_vila", name:"포트빌라", country:"바누아투", flag:"🇻🇺", alias:["port vila","vanuatu"] },
+  { key:"apia", name:"아피아", country:"사모아", flag:"🇼🇸", alias:["apia","samoa"] },
+  { key:"noumea", name:"누메아", country:"누벨칼레도니", flag:"🇳🇨", alias:["noumea","new caledonia"] }
+];
+
+/* ===== 장소 DB (도시별) =====
+  photo: 테마색 / time: 시간대 / budget: 예산대 / cost: 1인 예상비용
+  time: morning(07-11), lunch(11-14), afternoon(14-17), dinner(17-21), night(21+)
+*/
+const PLACES = {
+  tokyo: [
+    { name:"もつ焼きでん (모츠야키 덴)", emoji:"🍢", photo:"asianfood", cat:"이자카야", desc:"시부야 직장인 단골 숨은 맛집", local:0.91, crowd:"high", note:"웨이팅 25분", time:["dinner"], budget:"mid", cost:"¥3,500" },
+    { name:"Trunk Hotel Shibuya", emoji:"🏨", photo:"hotel", cat:"부티크호텔", desc:"시부야 감성 부티크", local:0.82, crowd:"low", time:["morning","night"], budget:"high", cost:"¥38,000" },
+    { name:"Toyoko Inn Shibuya", emoji:"🏨", photo:"hotel", cat:"비즈니스호텔", desc:"가성비 깔끔한 체인", local:0.72, crowd:"low", time:["morning","night"], budget:"low", cost:"¥9,800" },
+    { name:"메구로강 산책로", emoji:"🌸", photo:"nature", cat:"야경", desc:"조용한 현지 산책 코스", local:0.88, crowd:"low", time:["afternoon","night"], budget:"low", cost:"무료" },
+    { name:"야나카긴자 상점가", emoji:"🏮", photo:"market", cat:"로컬 골목", desc:"서민 감성 옛 상점가", local:0.93, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"¥1,500" },
+    { name:"Blue Bottle 키요스미", emoji:"☕", photo:"cafe", cat:"카페", desc:"스페셜티 커피 1호점", local:0.74, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"¥800" },
+    { name:"스시 이사오", emoji:"🍣", photo:"asianfood", cat:"스시", desc:"현지인 점심 스시집", local:0.87, crowd:"mid", note:"웨이팅 15분", time:["lunch"], budget:"mid", cost:"¥2,800" },
+    { name:"하마리큐 정원", emoji:"🌿", photo:"nature", cat:"정원", desc:"도심 속 조용한 에도 정원", local:0.79, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"¥300" },
+    { name:"츠키지 외장시장", emoji:"🐟", photo:"market", cat:"시장", desc:"현지인 아침 시장", local:0.81, crowd:"high", time:["morning"], budget:"low", cost:"¥1,800" },
+    { name:"시모키타자와 빈티지", emoji:"🛍️", photo:"shopping", cat:"쇼핑", desc:"MZ 감성 빈티지 골목", local:0.85, crowd:"mid", time:["afternoon"], budget:"mid", cost:"¥5,000" },
+    { name:"아사쿠사 골목 라멘", emoji:"🍜", photo:"asianfood", cat:"라멘", desc:"30년 현지 단골집", local:0.89, crowd:"mid", time:["lunch","dinner"], budget:"low", cost:"¥1,200" },
+    { name:"Narisawa", emoji:"🥂", photo:"food", cat:"파인다이닝", desc:"미슐랭 2스타 오마카세", local:0.55, crowd:"low", time:["dinner"], budget:"lux", cost:"¥35,000" },
+    { name:"Park Hyatt Tokyo", emoji:"🏙️", photo:"hotel", cat:"럭셔리호텔", desc:"신주쿠 프리미엄 숙소", local:0.48, crowd:"low", time:["morning","night"], budget:"lux", cost:"¥65,000" },
+    { name:"요요기 공원 아침산책", emoji:"🌳", photo:"nature", cat:"공원", desc:"현지인 조깅 코스", local:0.90, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+    { name:"신주쿠 골든가이", emoji:"🏮", photo:"night", cat:"바 골목", desc:"미니 바 골목 야경", local:0.68, crowd:"mid", time:["night"], budget:"mid", cost:"¥2,500" },
+    { name:"덴푸라 콘도", emoji:"🍤", photo:"asianfood", cat:"튀김 파인", desc:"미슐랭 튀김 전문", local:0.62, crowd:"low", time:["dinner"], budget:"lux", cost:"¥18,000" },
+  ],
+  osaka: [
+    { name:"타코야키 와나카 본점", emoji:"🐙", photo:"asianfood", cat:"길거리", desc:"진짜 오사카 타코야키", local:0.92, crowd:"high", note:"웨이팅 20분", time:["lunch","afternoon"], budget:"low", cost:"¥600" },
+    { name:"호젠지 요코초", emoji:"🏮", photo:"night", cat:"이자카야", desc:"골목 현지 술집 야경", local:0.89, crowd:"mid", time:["dinner","night"], budget:"mid", cost:"¥3,500" },
+    { name:"우메다 공중정원", emoji:"🌃", photo:"night", cat:"전망대", desc:"석양 뷰 포인트", local:0.71, crowd:"mid", time:["afternoon","night"], budget:"mid", cost:"¥1,500" },
+    { name:"쿠로몬 시장", emoji:"🍤", photo:"market", cat:"시장", desc:"아침 현지 주방", local:0.83, crowd:"mid", time:["morning","lunch"], budget:"low", cost:"¥2,000" },
+    { name:"Hotel She Osaka", emoji:"🏨", photo:"hotel", cat:"부티크", desc:"부두 뷰 부티크 호텔", local:0.78, crowd:"low", time:["morning","night"], budget:"mid", cost:"¥22,000" },
+    { name:"오사카성 공원 산책", emoji:"🏯", photo:"culture", cat:"문화", desc:"현지인 조깅 코스", local:0.76, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"신세카이 쿠시카츠", emoji:"🍢", photo:"asianfood", cat:"쿠시카츠", desc:"현지 레트로 골목", local:0.84, crowd:"mid", time:["dinner"], budget:"low", cost:"¥2,000" },
+    { name:"미츠이 가든 호텔", emoji:"🏨", photo:"hotel", cat:"비즈니스", desc:"가성비 중급 호텔", local:0.69, crowd:"low", time:["morning","night"], budget:"low", cost:"¥12,000" },
+    { name:"Conrad Osaka", emoji:"🏙️", photo:"hotel", cat:"럭셔리", desc:"나카노시마 프리미엄", local:0.42, crowd:"low", time:["morning","night"], budget:"lux", cost:"¥55,000" },
+    { name:"텐노지 공원 카페", emoji:"☕", photo:"cafe", cat:"카페", desc:"현지인 주말 브런치", local:0.81, crowd:"low", time:["morning","afternoon"], budget:"mid", cost:"¥1,200" },
+  ],
+  kyoto: [
+    { name:"니시키 시장", emoji:"🍡", photo:"market", cat:"시장", desc:"400년 된 교토 부엌", local:0.75, crowd:"high", time:["lunch","afternoon"], budget:"low", cost:"¥1,800" },
+    { name:"후시미 이나리 새벽", emoji:"⛩️", photo:"culture", cat:"신사", desc:"관광객 피한 새벽", local:0.88, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+    { name:"가모가와 산책", emoji:"🌸", photo:"nature", cat:"강변", desc:"현지인 조깅 코스", local:0.92, crowd:"low", time:["morning","afternoon","night"], budget:"low", cost:"무료" },
+    { name:"% Arabica 교토점", emoji:"☕", photo:"cafe", cat:"카페", desc:"일본 대표 스페셜티", local:0.58, crowd:"high", time:["morning","afternoon"], budget:"mid", cost:"¥700" },
+    { name:"긴카쿠지 주변 료칸", emoji:"🏯", photo:"hotel", cat:"료칸", desc:"전통 다다미 숙소", local:0.72, crowd:"low", time:["morning","night"], budget:"high", cost:"¥42,000" },
+    { name:"Kitcho Arashiyama", emoji:"🥂", photo:"food", cat:"미슐랭 3스타", desc:"가이세키 정식", local:0.45, crowd:"low", time:["dinner"], budget:"lux", cost:"¥55,000" },
+    { name:"기온 현지 우동집", emoji:"🍜", photo:"asianfood", cat:"우동", desc:"관광객 적은 뒷골목", local:0.91, crowd:"low", time:["lunch","dinner"], budget:"low", cost:"¥1,100" },
+    { name:"철학의 길 산책", emoji:"🍂", photo:"nature", cat:"산책", desc:"사계절 변화 체험", local:0.82, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"무료" },
+  ],
+  fukuoka: [
+    { name:"이치란 본점", emoji:"🍜", photo:"asianfood", cat:"라멘", desc:"돈코츠 라멘 원조", local:0.72, crowd:"high", time:["lunch","dinner"], budget:"low", cost:"¥1,000" },
+    { name:"야타이 포장마차 거리", emoji:"🏮", photo:"night", cat:"야시장", desc:"현지 밤문화 필수", local:0.85, crowd:"mid", time:["dinner","night"], budget:"low", cost:"¥2,500" },
+    { name:"오호리 공원", emoji:"🌿", photo:"nature", cat:"공원", desc:"현지인 산책 코스", local:0.89, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"Grand Hyatt Fukuoka", emoji:"🏨", photo:"hotel", cat:"럭셔리", desc:"캐널시티 프리미엄", local:0.48, crowd:"low", time:["morning","night"], budget:"high", cost:"¥32,000" },
+    { name:"APA 호텔 하카타", emoji:"🏨", photo:"hotel", cat:"비즈니스", desc:"역세권 가성비", local:0.71, crowd:"low", time:["morning","night"], budget:"low", cost:"¥8,500" },
+  ],
+  bangkok: [
+    { name:"Jay Fai", emoji:"🔥", photo:"asianfood", cat:"미슐랭 길거리", desc:"게 오믈렛 전설", local:0.76, crowd:"high", note:"웨이팅 1시간", time:["dinner"], budget:"mid", cost:"฿1,500" },
+    { name:"Ari 로컬 카페거리", emoji:"☕", photo:"cafe", cat:"카페", desc:"MZ 현지인 동네", local:0.88, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"฿150" },
+    { name:"창추이 주말 마켓", emoji:"🎪", photo:"market", cat:"로컬 마켓", desc:"현지 아티스트 마켓", local:0.91, crowd:"mid", time:["afternoon"], budget:"low", cost:"฿400" },
+    { name:"왓 아룬 야경", emoji:"🌅", photo:"culture", cat:"사원", desc:"강 건너편 뷰", local:0.68, crowd:"mid", time:["night"], budget:"low", cost:"฿100" },
+    { name:"Chatuchak 주말시장", emoji:"🛍️", photo:"shopping", cat:"쇼핑", desc:"세계 최대 주말시장", local:0.79, crowd:"high", time:["morning","afternoon"], budget:"low", cost:"฿800" },
+    { name:"짜오프라야 강 페리", emoji:"⛵", photo:"beach", cat:"이동", desc:"현지 교통 수단", local:0.93, crowd:"mid", time:["afternoon","night"], budget:"low", cost:"฿30" },
+    { name:"Mandarin Oriental", emoji:"🏙️", photo:"hotel", cat:"럭셔리", desc:"강변 5성급 클래식", local:0.38, crowd:"low", time:["morning","night"], budget:"lux", cost:"฿18,000" },
+    { name:"Ibis Styles Bangkok", emoji:"🏨", photo:"hotel", cat:"비즈니스", desc:"실롬 가성비 호텔", local:0.68, crowd:"low", time:["morning","night"], budget:"low", cost:"฿1,800" },
+    { name:"또른 Tom Yum", emoji:"🌶️", photo:"asianfood", cat:"로컬 식당", desc:"현지인 점심 톰얌꿍", local:0.89, crowd:"mid", time:["lunch"], budget:"low", cost:"฿180" },
+    { name:"룸피니 공원 조깅", emoji:"🏃", photo:"nature", cat:"공원", desc:"아침 태극권 현지", local:0.92, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+  ],
+  chiangmai: [
+    { name:"Warorot 시장", emoji:"🍲", photo:"market", cat:"시장", desc:"현지 아침 시장", local:0.90, crowd:"mid", time:["morning"], budget:"low", cost:"฿150" },
+    { name:"도이 수텝 사원", emoji:"🛕", photo:"culture", cat:"사원", desc:"산 정상 뷰포인트", local:0.65, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"฿50" },
+    { name:"Nimman 카페거리", emoji:"☕", photo:"cafe", cat:"카페", desc:"젊은 감성 골목", local:0.78, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"฿120" },
+    { name:"선데이 워킹스트릿", emoji:"🎪", photo:"market", cat:"야시장", desc:"주말 로컬 핸드메이드", local:0.82, crowd:"high", time:["night"], budget:"low", cost:"฿500" },
+  ],
+  danang: [
+    { name:"미케 비치 아침산책", emoji:"🏖️", photo:"beach", cat:"해변", desc:"현지 아침 수영", local:0.85, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+    { name:"반미 피 (Bánh Mì Phượng)", emoji:"🥖", photo:"asianfood", cat:"반미", desc:"현지 반미 성지", local:0.88, crowd:"high", time:["morning","lunch"], budget:"low", cost:"₫35,000" },
+    { name:"손트라 반도 드라이브", emoji:"🌊", photo:"nature", cat:"드라이브", desc:"절벽 해안도로", local:0.72, crowd:"low", time:["afternoon"], budget:"low", cost:"₫50,000" },
+    { name:"Con Market", emoji:"🥭", photo:"market", cat:"시장", desc:"현지 과일/먹거리", local:0.89, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"₫100,000" },
+    { name:"InterContinental Danang", emoji:"🏙️", photo:"hotel", cat:"럭셔리 리조트", desc:"반도 절벽 리조트", local:0.32, crowd:"low", time:["morning","night"], budget:"lux", cost:"₫5,500,000" },
+    { name:"다낭 성당 주변 쌀국수", emoji:"🍜", photo:"asianfood", cat:"현지식", desc:"숨은 로컬 쌀국수", local:0.94, crowd:"mid", time:["lunch","dinner"], budget:"low", cost:"₫40,000" },
+    { name:"한 시장 야간 식당", emoji:"🍤", photo:"night", cat:"저녁시장", desc:"현지 해산물 저녁", local:0.86, crowd:"mid", time:["dinner","night"], budget:"low", cost:"₫180,000" },
+    { name:"용교 드래곤 브릿지", emoji:"🐉", photo:"night", cat:"야경", desc:"주말 밤 불쇼", local:0.78, crowd:"high", time:["night"], budget:"low", cost:"무료" },
+  ],
+  hanoi: [
+    { name:"호안끼엠 호수 새벽", emoji:"🌳", photo:"nature", cat:"호수", desc:"현지인 아침 태극권", local:0.92, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+    { name:"Bún chả Hương Liên", emoji:"🍜", photo:"asianfood", cat:"분짜", desc:"오바마도 먹은 분짜", local:0.84, crowd:"high", time:["lunch"], budget:"low", cost:"₫60,000" },
+    { name:"구시가지 골목", emoji:"🏮", photo:"market", cat:"골목", desc:"36거리 현지 상권", local:0.87, crowd:"mid", time:["afternoon"], budget:"low", cost:"₫200,000" },
+    { name:"Metropole Hanoi", emoji:"🏛️", photo:"hotel", cat:"클래식 럭셔리", desc:"프렌치 콜로니얼", local:0.35, crowd:"low", time:["morning","night"], budget:"lux", cost:"$250" },
+  ],
+  hcmc: [
+    { name:"Pho Hoa", emoji:"🍜", photo:"asianfood", cat:"쌀국수", desc:"사이공 현지 쌀국수", local:0.87, crowd:"high", time:["morning","lunch"], budget:"low", cost:"₫65,000" },
+    { name:"벤탄 시장", emoji:"🧺", photo:"market", cat:"시장", desc:"현지 생활시장", local:0.81, crowd:"high", time:["morning","afternoon"], budget:"low", cost:"₫150,000" },
+    { name:"루프탑 바 Shri", emoji:"🍸", photo:"night", cat:"바", desc:"스카이라인 뷰", local:0.58, crowd:"mid", time:["night"], budget:"mid", cost:"₫350,000" },
+  ],
+  taipei: [
+    { name:"Fujin Street 카페", emoji:"☕", photo:"cafe", cat:"카페", desc:"현지 감성 골목", local:0.89, crowd:"low", time:["morning","afternoon"], budget:"mid", cost:"NT$200" },
+    { name:"Raohe 야시장", emoji:"🦑", photo:"night", cat:"야시장", desc:"현지인 저녁 핫스팟", local:0.91, crowd:"high", time:["dinner","night"], budget:"low", cost:"NT$400" },
+    { name:"우라이 온천 마을", emoji:"♨️", photo:"nature", cat:"온천", desc:"원주민 마을 힐링", local:0.77, crowd:"low", time:["afternoon"], budget:"mid", cost:"NT$500" },
+    { name:"딘타이펑 본점", emoji:"🥟", photo:"asianfood", cat:"딤섬", desc:"원조 샤오롱바오", local:0.68, crowd:"high", time:["lunch","dinner"], budget:"mid", cost:"NT$500" },
+    { name:"타이베이 101 전망대", emoji:"🏙️", photo:"night", cat:"전망대", desc:"도시 야경", local:0.35, crowd:"mid", time:["afternoon","night"], budget:"mid", cost:"NT$600" },
+    { name:"행화림 전통 두부", emoji:"🥢", photo:"asianfood", cat:"전통식", desc:"현지 취두부 골목", local:0.93, crowd:"mid", time:["lunch","dinner"], budget:"low", cost:"NT$120" },
+    { name:"Grand Hyatt Taipei", emoji:"🏨", photo:"hotel", cat:"럭셔리", desc:"101 인근 5성", local:0.42, crowd:"low", time:["morning","night"], budget:"high", cost:"NT$8,500" },
+  ],
+  singapore: [
+    { name:"호커센터 Lau Pa Sat", emoji:"🍢", photo:"asianfood", cat:"호커", desc:"직장인 점심 호커", local:0.78, crowd:"high", time:["lunch","dinner"], budget:"low", cost:"S$10" },
+    { name:"Tiong Bahru 로컬동네", emoji:"☕", photo:"cafe", cat:"로컬", desc:"Art Deco 현지 동네", local:0.86, crowd:"low", time:["morning","afternoon"], budget:"mid", cost:"S$25" },
+    { name:"가든스 바이 더 베이", emoji:"🌺", photo:"nature", cat:"정원", desc:"도심 속 미래 정원", local:0.45, crowd:"high", time:["afternoon","night"], budget:"mid", cost:"S$28" },
+    { name:"Marina Bay Sands", emoji:"🏙️", photo:"hotel", cat:"럭셔리", desc:"인피니티풀 상징", local:0.25, crowd:"high", time:["morning","night"], budget:"lux", cost:"S$650" },
+  ],
+  hongkong: [
+    { name:"완차이 현지 차찬텡", emoji:"🍽️", photo:"asianfood", cat:"차찬텡", desc:"직장인 아침 단골", local:0.88, crowd:"mid", time:["morning","lunch"], budget:"low", cost:"HK$60" },
+    { name:"빅토리아 피크 야경", emoji:"🌃", photo:"night", cat:"야경", desc:"홍콩 상징 야경", local:0.48, crowd:"high", time:["night"], budget:"mid", cost:"HK$200" },
+    { name:"몽콕 야시장", emoji:"🎪", photo:"market", cat:"시장", desc:"현지 저녁 시장", local:0.82, crowd:"mid", time:["dinner","night"], budget:"low", cost:"HK$150" },
+    { name:"차이완 항구 투어", emoji:"⛵", photo:"beach", cat:"해안", desc:"현지 낚시 스팟", local:0.91, crowd:"low", time:["afternoon"], budget:"low", cost:"HK$50" },
+  ],
+  bali: [
+    { name:"우붓 계단논", emoji:"🌾", photo:"nature", cat:"자연", desc:"계단식 논 트레킹", local:0.68, crowd:"mid", time:["morning"], budget:"low", cost:"Rp 20,000" },
+    { name:"짱구 비치 서핑", emoji:"🏄", photo:"beach", cat:"서핑", desc:"현지 서퍼 비치", local:0.72, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"Rp 300,000" },
+    { name:"Locavore", emoji:"🥂", photo:"food", cat:"파인다이닝", desc:"현지 재료 파인", local:0.42, crowd:"low", time:["dinner"], budget:"high", cost:"Rp 2,500,000" },
+    { name:"Tegallalang 수공예 거리", emoji:"🧺", photo:"shopping", cat:"공예", desc:"현지 우드 공예", local:0.85, crowd:"low", time:["afternoon"], budget:"low", cost:"Rp 150,000" },
+  ],
+  seoul: [
+    { name:"익선동 한옥 골목", emoji:"🏮", photo:"culture", cat:"골목", desc:"감성 카페 골목", local:0.78, crowd:"mid", time:["afternoon","night"], budget:"mid", cost:"₩18,000" },
+    { name:"망원시장 먹자", emoji:"🥟", photo:"market", cat:"시장", desc:"현지인 저녁시장", local:0.86, crowd:"mid", time:["dinner"], budget:"low", cost:"₩15,000" },
+    { name:"서촌 백년가옥 카페", emoji:"☕", photo:"cafe", cat:"카페", desc:"조용한 한옥 산책", local:0.82, crowd:"low", time:["morning","afternoon"], budget:"mid", cost:"₩9,000" },
+    { name:"을지로 노가리골목", emoji:"🍻", photo:"night", cat:"술골목", desc:"MZ 힙지로 감성", local:0.84, crowd:"high", time:["dinner","night"], budget:"low", cost:"₩25,000" },
+    { name:"남산 둘레길", emoji:"🌳", photo:"nature", cat:"산책", desc:"도심 속 힐링", local:0.88, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"성수 팝업", emoji:"🛍️", photo:"shopping", cat:"팝업거리", desc:"브랜드 체험 공간", local:0.79, crowd:"mid", time:["afternoon"], budget:"mid", cost:"₩30,000" },
+    { name:"Signiel Seoul", emoji:"🏙️", photo:"hotel", cat:"럭셔리", desc:"잠실 프리미엄", local:0.35, crowd:"low", time:["morning","night"], budget:"lux", cost:"₩620,000" },
+    { name:"마포 갈매기살 골목", emoji:"🥩", photo:"asianfood", cat:"고기", desc:"직장인 회식 골목", local:0.89, crowd:"high", time:["dinner"], budget:"mid", cost:"₩35,000" },
+  ],
+  busan: [
+    { name:"해운대 조각공원 산책", emoji:"🌊", photo:"beach", cat:"해변", desc:"현지 아침 산책", local:0.82, crowd:"low", time:["morning"], budget:"low", cost:"무료" },
+    { name:"자갈치 시장", emoji:"🦐", photo:"market", cat:"시장", desc:"현지 수산시장", local:0.88, crowd:"mid", time:["morning","lunch"], budget:"mid", cost:"₩25,000" },
+    { name:"감천문화마을", emoji:"🎨", photo:"culture", cat:"마을", desc:"현지 생활감성", local:0.58, crowd:"high", time:["afternoon"], budget:"low", cost:"₩6,000" },
+    { name:"광안리 포장마차", emoji:"🍢", photo:"night", cat:"야경", desc:"바다 앞 포차", local:0.84, crowd:"mid", time:["dinner","night"], budget:"mid", cost:"₩30,000" },
+  ],
+  jeju: [
+    { name:"성산일출봉 새벽", emoji:"🌅", photo:"nature", cat:"자연", desc:"일출 현지 포인트", local:0.72, crowd:"mid", time:["morning"], budget:"low", cost:"₩5,000" },
+    { name:"올레길 7코스 산책", emoji:"🌿", photo:"nature", cat:"산책", desc:"현지 추천 코스", local:0.84, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"동문시장 고기국수", emoji:"🍜", photo:"asianfood", cat:"로컬", desc:"현지인 점심 국수", local:0.91, crowd:"mid", time:["lunch"], budget:"low", cost:"₩9,000" },
+  ],
+  paris: [
+    { name:"Rue Cler 로컬 식료품거리", emoji:"🥐", photo:"market", cat:"마켓거리", desc:"현지 장보는 거리", local:0.86, crowd:"low", time:["morning","lunch"], budget:"mid", cost:"€25" },
+    { name:"Le Marais 숨은 비스트로", emoji:"🍷", photo:"food", cat:"비스트로", desc:"현지 단골 비스트로", local:0.81, crowd:"mid", time:["dinner"], budget:"mid", cost:"€45" },
+    { name:"Canal Saint-Martin 산책", emoji:"🌳", photo:"nature", cat:"운하", desc:"현지 소풍 코스", local:0.88, crowd:"low", time:["afternoon"], budget:"low", cost:"무료" },
+    { name:"Septime", emoji:"🥂", photo:"food", cat:"파인다이닝", desc:"현지 힙스터 파인", local:0.52, crowd:"high", time:["dinner"], budget:"lux", cost:"€180" },
+    { name:"Merci 편집샵", emoji:"🛍️", photo:"shopping", cat:"쇼핑", desc:"파리 감성 편집샵", local:0.71, crowd:"mid", time:["afternoon"], budget:"mid", cost:"€60" },
+    { name:"Hôtel Particulier Montmartre", emoji:"🏨", photo:"hotel", cat:"부티크", desc:"몽마르뜨 프라이빗", local:0.42, crowd:"low", time:["morning","night"], budget:"lux", cost:"€420" },
+    { name:"ibis Paris Bastille", emoji:"🏨", photo:"hotel", cat:"비즈니스", desc:"가성비 역세권", local:0.72, crowd:"low", time:["morning","night"], budget:"low", cost:"€95" },
+  ],
+  london: [
+    { name:"Borough Market", emoji:"🧀", photo:"market", cat:"시장", desc:"1000년 된 푸드마켓", local:0.82, crowd:"high", time:["lunch","afternoon"], budget:"mid", cost:"£15" },
+    { name:"Shoreditch 로컬 펍", emoji:"🍺", photo:"night", cat:"펍", desc:"이스트 런던 힙스터", local:0.87, crowd:"mid", time:["night"], budget:"mid", cost:"£30" },
+    { name:"Hampstead Heath 산책", emoji:"🌳", photo:"nature", cat:"공원", desc:"현지 주말 산책", local:0.92, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"Dishoom Shoreditch", emoji:"🍛", photo:"asianfood", cat:"인도", desc:"현지 브런치 성지", local:0.78, crowd:"high", time:["morning","lunch"], budget:"mid", cost:"£22" },
+    { name:"The Savoy", emoji:"🏛️", photo:"hotel", cat:"클래식 럭셔리", desc:"테임스 뷰 5성", local:0.38, crowd:"low", time:["morning","night"], budget:"lux", cost:"£650" },
+  ],
+  newyork: [
+    { name:"Katz's Delicatessen", emoji:"🥪", photo:"food", cat:"델리", desc:"100년 파스트라미", local:0.74, crowd:"high", time:["lunch"], budget:"mid", cost:"$30" },
+    { name:"브루클린 커피숍 골목", emoji:"☕", photo:"cafe", cat:"카페", desc:"윌리엄스버그 힙", local:0.86, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"$8" },
+    { name:"센트럴파크 피크닉", emoji:"🌳", photo:"nature", cat:"공원", desc:"현지 주말 피크닉", local:0.88, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:"로어이스트 바 Attaboy", emoji:"🍸", photo:"night", cat:"히든 바", desc:"현지 힙스터 바", local:0.84, crowd:"mid", time:["night"], budget:"high", cost:"$80" },
+    { name:"Eleven Madison Park", emoji:"🥂", photo:"food", cat:"미슐랭 3스타", desc:"세계 최고 비건 파인", local:0.35, crowd:"high", time:["dinner"], budget:"lux", cost:"$400" },
+    { name:"Chelsea Market", emoji:"🍜", photo:"market", cat:"마켓", desc:"푸드홀 현지식", local:0.76, crowd:"high", time:["lunch"], budget:"mid", cost:"$25" },
+    { name:"Pod 51 Hotel", emoji:"🏨", photo:"hotel", cat:"컴팩트", desc:"미드타운 가성비", local:0.58, crowd:"low", time:["morning","night"], budget:"mid", cost:"$180" },
+  ],
+  barcelona: [
+    { name:"Mercat de Sant Antoni", emoji:"🥖", photo:"market", cat:"시장", desc:"현지 생활시장", local:0.89, crowd:"low", time:["morning","lunch"], budget:"low", cost:"€15" },
+    { name:"Gràcia 골목 타파스", emoji:"🍷", photo:"food", cat:"타파스", desc:"현지 동네 타파스", local:0.91, crowd:"mid", time:["dinner","night"], budget:"mid", cost:"€35" },
+    { name:"Bunkers del Carmel", emoji:"🌅", photo:"night", cat:"전망", desc:"바르셀로나 일몰", local:0.82, crowd:"mid", time:["afternoon","night"], budget:"low", cost:"무료" },
+    { name:"Ciutadella 공원", emoji:"🌳", photo:"nature", cat:"공원", desc:"현지 주말 공원", local:0.88, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"무료" },
+  ],
+  rome: [
+    { name:"Testaccio Market", emoji:"🍅", photo:"market", cat:"시장", desc:"로마 현지 시장", local:0.91, crowd:"mid", time:["morning","lunch"], budget:"low", cost:"€12" },
+    { name:"Trastevere 동네 식당", emoji:"🍝", photo:"food", cat:"트라토리아", desc:"현지 가족 운영", local:0.86, crowd:"mid", time:["dinner"], budget:"mid", cost:"€28" },
+    { name:"아벤티노 언덕 일몰", emoji:"🌆", photo:"nature", cat:"전망", desc:"오렌지 정원 뷰", local:0.84, crowd:"low", time:["afternoon","night"], budget:"low", cost:"무료" },
+  ],
+};
+
+/* ===== 한국 공휴일 (2026-2027) ===== */
+const HOLIDAYS = {
+  "2026-01-01":"신정",
+  "2026-02-16":"설날","2026-02-17":"설날","2026-02-18":"설날",
+  "2026-03-01":"삼일절","2026-03-02":"대체",
+  "2026-05-05":"어린이날","2026-05-24":"부처님오신날","2026-05-25":"대체",
+  "2026-06-06":"현충일","2026-08-15":"광복절",
+  "2026-09-24":"추석","2026-09-25":"추석","2026-09-26":"추석",
+  "2026-10-03":"개천절","2026-10-09":"한글날","2026-12-25":"성탄절",
+  "2027-01-01":"신정",
+  "2027-02-06":"설날","2027-02-07":"설날","2027-02-08":"설날",
+  "2027-03-01":"삼일절","2027-05-05":"어린이날",
+  "2027-06-06":"현충일","2027-08-15":"광복절",
+  "2027-09-14":"추석","2027-09-15":"추석","2027-09-16":"추석",
+  "2027-10-03":"개천절","2027-10-09":"한글날","2027-12-25":"성탄절"
+};
+</script>
+
+<!-- CALENDAR OVERLAY -->
+<div class="cal-overlay" id="calOverlay">
+  <div class="cal-sheet">
+    <div class="cal-top">
+      <div class="ttl" id="calTitle">여행 일정 선택</div>
+      <button class="iconbtn" onclick="closeCal()" style="background:#F4F4F4">✕</button>
+    </div>
+    <div class="cal-nav">
+      <button onclick="calPrev()">‹</button>
+      <div class="mo" id="calMonth">2026년 5월</div>
+      <button onclick="calNext()">›</button>
+    </div>
+    <div class="cal-week">
+      <div class="sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="sat">토</div>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-info" id="calInfo">출발일을 먼저 선택하세요</div>
+    <div class="cal-foot">
+      <button class="btn btn-ghost" onclick="resetCal()">초기화</button>
+      <button class="btn btn-primary" onclick="confirmCal()" id="calConfirm" disabled>선택 완료</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==================== STATE ==================== */
+const state = {
+  apiKey: "",
+  model: "gpt-4o-mini",
+  destinationKey: "",
+  startDate: null,   // "YYYY-MM-DD"
+  endDate: null,
+  budget: 120,       // 만원 단위
+  styles: [],
+  companion: "couple",
+  generated: null,
+  activeDay: 0,
+  activeActivity: null,
+  calTarget: "start",
+  calMonth: new Date(2026, 4, 1), // 2026-05
+  pendingStart: null,
+  pendingEnd: null
+};
+
+const STYLES = [
+  { key:"food", emoji:"🍜", label:"현지 맛집" },
+  { key:"culture", emoji:"🏛️", label:"문화/역사" },
+  { key:"shopping", emoji:"🛍️", label:"쇼핑" },
+  { key:"nature", emoji:"🌿", label:"자연/힐링" },
+  { key:"night", emoji:"🌃", label:"야경" },
+  { key:"activity", emoji:"🎢", label:"액티비티" }
+];
+
+const COMPANIONS = [
+  { key:"solo", label:"혼자" },
+  { key:"couple", label:"연인" },
+  { key:"friends", label:"친구" },
+  { key:"family", label:"가족" }
+];
+
+/* ==================== NAVIGATION ==================== */
+function go(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active","prev"));
+  const t = document.getElementById("view-"+id);
+  if(t) t.classList.add("active");
+}
+
+/* ==================== AUTH (로그인/회원가입) ==================== */
+var authMode = "login"; // "login" | "signup"
+var currentUser = null;
+var USER_STORE_KEY = "tst_users_v1";
+var SESSION_KEY = "tst_session_v1";
+
+function _readUsers(){
+  try{ return JSON.parse(localStorage.getItem(USER_STORE_KEY)||"{}"); }catch(e){ return {}; }
+}
+function _writeUsers(u){
+  try{ localStorage.setItem(USER_STORE_KEY, JSON.stringify(u)); }catch(e){}
+}
+function _hashPw(s){
+  // simple non-crypto hash just to avoid raw plaintext (not secure, demo only)
+  var h = 2166136261>>>0;
+  for(var i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619)>>>0; }
+  return h.toString(16);
+}
+function _validEmail(e){ return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+
+function switchAuth(mode){
+  authMode = mode;
+  document.getElementById("tabLogin").classList.toggle("on", mode==="login");
+  document.getElementById("tabSignup").classList.toggle("on", mode==="signup");
+  document.getElementById("fieldName").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("fieldPw2").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("checkRemember").style.display = (mode==="login")?"flex":"none";
+  document.getElementById("checkAgree").style.display = (mode==="signup")?"flex":"none";
+  document.getElementById("authSubmit").textContent = (mode==="signup")?"회원가입":"로그인";
+  document.getElementById("authTitle").textContent = (mode==="signup")?"3초 여행을 시작하세요":"다시 오신 걸 환영해요";
+  document.getElementById("authSub").textContent = (mode==="signup")?"이메일로 간단하게 가입하세요":"AI가 맞춤 일정을 완성해드릴게요";
+  document.getElementById("authFoot").innerHTML = (mode==="signup")
+    ? '이미 계정이 있으신가요? <a onclick="switchAuth(\'login\')">로그인</a>'
+    : '계정이 없으신가요? <a onclick="switchAuth(\'signup\')">회원가입</a>';
+  document.getElementById("authPw").setAttribute("autocomplete", mode==="signup"?"new-password":"current-password");
+  document.getElementById("authError").textContent = "";
+}
+
+function togglePw(){
+  var inp = document.getElementById("authPw");
+  var btn = document.querySelector(".pw-toggle");
+  if(inp.type === "password"){ inp.type = "text"; if(btn) btn.textContent = "숨김"; }
+  else { inp.type = "password"; if(btn) btn.textContent = "보기"; }
+}
+
+function submitAuth(ev){
+  if(ev && ev.preventDefault) ev.preventDefault();
+  var email = (document.getElementById("authEmail").value||"").trim().toLowerCase();
+  var pw    = document.getElementById("authPw").value||"";
+  var err   = document.getElementById("authError");
+  err.textContent = "";
+
+  if(!_validEmail(email)){ err.textContent = "올바른 이메일 주소를 입력해주세요."; return false; }
+  if(pw.length < 6){ err.textContent = "비밀번호는 6자 이상이어야 합니다."; return false; }
+
+  var users = _readUsers();
+
+  if(authMode === "signup"){
+    var name = (document.getElementById("authName").value||"").trim();
+    var pw2  = document.getElementById("authPw2").value||"";
+    var agreed = document.getElementById("authAgree").checked;
+    if(!name){ err.textContent = "이름(닉네임)을 입력해주세요."; return false; }
+    if(pw !== pw2){ err.textContent = "비밀번호가 일치하지 않습니다."; return false; }
+    if(!agreed){ err.textContent = "이용약관에 동의해주세요."; return false; }
+    if(users[email]){ err.textContent = "이미 가입된 이메일입니다. 로그인해주세요."; return false; }
+    users[email] = { email:email, name:name, pwh:_hashPw(pw), created: Date.now() };
+    _writeUsers(users);
+    _setSession({ email:email, name:name }, true);
+    err.textContent = "";
+    onAuthSuccess({ email:email, name:name });
+    return false;
+  } else {
+    var u = users[email];
+    if(!u || u.pwh !== _hashPw(pw)){ err.textContent = "이메일 또는 비밀번호가 올바르지 않습니다."; return false; }
+    var remember = document.getElementById("authRemember").checked;
+    _setSession({ email:u.email, name:u.name }, remember);
+    onAuthSuccess({ email:u.email, name:u.name });
+    return false;
+  }
+}
+
+function socialLogin(provider){
+  // Demo: create/login a social user stub
+  var stubEmail = provider + "_user@demo.tst";
+  var stubName  = provider==="google"?"Google 사용자":provider==="kakao"?"카카오 사용자":"Apple 사용자";
+  var users = _readUsers();
+  if(!users[stubEmail]) users[stubEmail] = { email:stubEmail, name:stubName, pwh:"", social:provider, created: Date.now() };
+  _writeUsers(users);
+  _setSession({ email:stubEmail, name:stubName, social:provider }, true);
+  onAuthSuccess({ email:stubEmail, name:stubName });
+}
+
+function skipAuth(){
+  currentUser = { email:"guest@local", name:"게스트", guest:true };
+  renderUserChip();
+  go("input");
+}
+
+function _setSession(u, remember){
+  try{
+    if(remember) localStorage.setItem(SESSION_KEY, JSON.stringify(u));
+    else sessionStorage.setItem(SESSION_KEY, JSON.stringify(u));
+  }catch(e){}
+  currentUser = u;
+}
+
+function _readSession(){
+  try{
+    var s = localStorage.getItem(SESSION_KEY) || sessionStorage.getItem(SESSION_KEY);
+    return s ? JSON.parse(s) : null;
+  }catch(e){ return null; }
+}
+
+function onAuthSuccess(u){
+  currentUser = u;
+  renderUserChip();
+  go("input");
+}
+
+function renderUserChip(){
+  var chip = document.getElementById("userChip");
+  var av   = document.getElementById("userAvatar");
+  var gr   = document.getElementById("userGreeting");
+  var su   = document.getElementById("splashUser");
+  if(!chip) return;
+  if(currentUser && currentUser.name){
+    chip.style.display = "inline-flex";
+    av.textContent = currentUser.name.charAt(0).toUpperCase();
+    gr.textContent = currentUser.name + "님, 환영합니다";
+    if(su) su.style.display = currentUser.guest ? "none" : "flex";
+  } else {
+    chip.style.display = "none";
+    if(su) su.style.display = "none";
+  }
+}
+
+function logout(){
+  try{ localStorage.removeItem(SESSION_KEY); sessionStorage.removeItem(SESSION_KEY); }catch(e){}
+  currentUser = null;
+  renderUserChip();
+  // reset form
+  try{
+    document.getElementById("authEmail").value = "";
+    document.getElementById("authPw").value = "";
+    var n=document.getElementById("authName"); if(n) n.value="";
+    var p2=document.getElementById("authPw2"); if(p2) p2.value="";
+    document.getElementById("authError").textContent = "";
+    switchAuth("login");
+  }catch(e){}
+  go("splash");
+}
+
+function initAuth(){
+  // 첫 화면은 항상 스플래시. 세션이 있으면 유저 정보만 복원한다.
+  var s = _readSession();
+  if(s && s.email){
+    currentUser = s;
+    renderUserChip();
+  }
+  // 로그인 화면 초기 탭 상태
+  try{ switchAuth("login"); }catch(e){}
+}
+
+/* ==================== DATE HELPERS ==================== */
+function pad(n){ return n<10?"0"+n:""+n; }
+function ymd(d){ return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate()); }
+function parseYmd(s){ const p=s.split("-"); return new Date(+p[0],+p[1]-1,+p[2]); }
+function fmtDate(s){
+  if(!s) return "";
+  const d = parseYmd(s);
+  return (d.getMonth()+1)+"월 "+d.getDate()+"일 ("+["일","월","화","수","목","금","토"][d.getDay()]+")";
+}
+function daysBetween(a,b){
+  return Math.round((parseYmd(b)-parseYmd(a))/86400000)+1;
+}
+
+/* ==================== 위치(지역/동네) 자동 배정 ==================== */
+// 주요 도시의 실제 유명 지역/동네 (일부 선별)
+const CITY_AREAS = {
+  seoul:    ["종로","명동","이태원","성수동","홍대","가로수길","압구정","한남동","을지로","서촌"],
+  busan:    ["해운대","광안리","남포동","서면","기장","송정","감천문화마을","태종대"],
+  jeju:    ["제주시","애월","함덕","서귀포","성산일출봉","중문","우도","협재"],
+  tokyo:    ["시부야","신주쿠","긴자","아사쿠사","하라주쿠","롯폰기","아키하바라","기치조지","오모테산도","시모키타자와"],
+  osaka:    ["도톤보리","신사이바시","우메다","난바","신세카이","텐노지","나카노시마","오사카성"],
+  kyoto:    ["기온","아라시야마","후시미","히가시야마","사쿄","가와라마치","니시진"],
+  fukuoka:  ["하카타","텐진","나카스","다자이후","모모치","하코자키"],
+  bangkok:  ["수쿰윗","실롬","차이나타운","카오산로드","통러","아리","에까마이"],
+  singapore:["마리나베이","차이나타운","오차드","리틀 인디아","카통","클락키","티옹바루"],
+  paris:    ["마레","몽마르트","생제르맹","샹젤리제","라탱","바스티유","노트르담","오페라"],
+  london:   ["소호","쇼디치","코벤트 가든","노팅힐","캄덴","켄싱턴","메이페어","피카딜리"],
+  newyork:  ["맨해튼","브루클린","소호","이스트 빌리지","첼시","윌리엄스버그","할렘","퀸즈"],
+  rome:     ["트라스테베레","몬티","캄포 디 피오리","나보나","테스타치오","보르게세"],
+  barcelona:["고딕","그라시아","보른","라발","바르셀로네타","엘 포블레 섹"],
+  taipei:   ["시먼딩","다안","신이","디화제","융캉제","스린","베이터우"],
+  hongkong: ["센트럴","몽콕","침사추이","완차이","코즈웨이 베이","삼수이포"],
+  bali:     ["우붓","스미냑","짱구","꾸따","누사두아","짐바란","울루와뚜"],
+  hanoi:    ["호안끼엠","구시가","바딘","떠이호","짠대"],
+  hochiminh:["1군","2군","3군","벤탄","팜응우라오","4군"],
+  danang:   ["미케","한 마켓","응우한손","바나 힐스","손짜"],
+  sydney:   ["달링 하버","본다이","서리 힐스","킹스 크로스","뉴타운","파딩턴"],
+  dubai:    ["다운타운","마리나","데이라","주메이라","팜","비즈니스 베이"]
+};
+// 카테고리 → 지역 타입 후보 (도시별 DB가 없을 때 일반화)
+const AREA_BY_CAT = {
+  food:    ["미식 거리","구시가 식당가","시내 중심"],
+  asianfood:["골목식당가","야시장 주변","로컬 식당가"],
+  cafe:    ["카페 거리","구시가","예술가 지구"],
+  market:  ["재래시장","구시장 일대","시장 거리"],
+  culture: ["구시가 문화 지구","박물관 거리","역사 지구"],
+  shopping:["쇼핑 거리","백화점 구역","디자이너 거리"],
+  nature:  ["도심 공원","강변 지구","해안가"],
+  beach:   ["해변가","해안 산책로","리조트 존"],
+  night:   ["야시장 거리","클럽/바 거리","전망대 구역"],
+  hotel:   ["시내 중심","중앙역 근처","비즈니스 지구"],
+  airport: ["공항 구역"],
+  activity:["체험관 구역","관광 지구"]
+};
+function _pickArea(city, photo, seedStr){
+  const areas = CITY_AREAS[city.key];
+  const h = _hash((seedStr||"")+(city.key||""));
+  if(areas && areas.length){
+    return areas[h % areas.length];
+  }
+  const bucket = AREA_BY_CAT[photo] || AREA_BY_CAT.activity;
+  return bucket[h % bucket.length];
+}
+function fullLocation(area, city){
+  return area ? (area+", "+city.name) : city.name;
+}
+
+/* ==================== PHOTO HELPERS ==================== */
+// 카테고리 → 이미지 키워드(영문, Pollinations 프롬프트용 보조)
+const PHOTO_KEYWORDS = {
+  food:"restaurant food", asianfood:"asian food noodle", cafe:"cafe coffee shop",
+  hotel:"hotel lobby", nature:"nature park", night:"night city lights",
+  shopping:"shopping street", culture:"museum architecture", beach:"beach ocean",
+  airport:"airport terminal", market:"market street food", activity:"tourist activity"
+};
+function _hash(s){ let h=2166136261; for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=(h*16777619)>>>0; } return h>>>0; }
+// 장소명 → 영어/로마자 힌트 추출 (간단 규칙)
+function _asciiHint(s){
+  if(!s) return "";
+  // 괄호 안 영문이 있으면 그 영문 사용
+  const m = String(s).match(/\(([A-Za-z0-9\s'\-&]+)\)/);
+  if(m) return m[1].trim();
+  // 아니면 영어 단어만 추출
+  const eng = String(s).replace(/[^A-Za-z0-9\s'\-]/g," ").replace(/\s+/g," ").trim();
+  return eng;
+}
+// 구글맵 검색 URL — 정확한 위치 확인용(상세뷰에서 쓰임)
+function googleMapsUrl(q){
+  return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q);
+}
+// 메인 사진: Pollinations.ai를 통해 장소 이름·도시·카테고리로 이미지를 생성
+// 참고: Google Places 공식 사진은 API 키가 필요해, 키 없이 동작하는 가장 가까운 대안으로 사용
+function photoUrl(act){
+  const kw = PHOTO_KEYWORDS[act.photo] || "travel place";
+  const city = (state.generated && state.generated.city) || act.location || "";
+  const eng = _asciiHint(act.name) || _asciiHint(act.category);
+  const area = act.area || "";
+  // 프롬프트: 장소 대표 사진 느낌 (Google Maps main photo 대체)
+  const prompt = `${eng || act.name} ${area} ${city} ${kw}, real place photo, bright natural light, 4k, google maps style cover photo`;
+  const seed = _hash((act.name||"")+(act.location||"")) % 99999;
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=600&height=400&nologo=true&model=flux&seed=${seed}`;
+}
+// 폴백: Pollinations 실패 시 LoremFlickr의 키워드 이미지
+function photoUrlFallback(act){
+  const kw = (PHOTO_KEYWORDS[act.photo] || "travel").replace(/\s+/g,",");
+  const loc = (act.location||"").replace(/[^A-Za-z]/g,"").toLowerCase();
+  const seed = _hash((act.name||"")+(act.location||""));
+  const tags = encodeURIComponent(kw + (loc?","+loc:""));
+  return `https://loremflickr.com/600/400/${tags}?lock=${seed%99999}`;
+}
+
+/* ==================== POPULAR DESTINATIONS ==================== */
+const POPULAR_KEYS = ["tokyo","osaka","bangkok","danang","paris","newyork","bali","taipei","jeju"];
+function renderPopular(){
+  const pg = document.getElementById("popGrid");
+  if(!pg) return;
+  const list = POPULAR_KEYS.map(k=>CITIES.find(c=>c.key===k)).filter(Boolean);
+  pg.innerHTML = list.map(c =>
+    `<div class="pop-card" data-key="${c.key}" onclick="selectDest('${c.key}')">
+       <div class="flg">${c.flag}</div>
+       <div class="cnm">${c.name}</div>
+       <div class="ctr">${c.country}</div>
+     </div>`
+  ).join("");
+}
+function updatePopularUI(){
+  document.querySelectorAll(".pop-card").forEach(el=>{
+    el.classList.toggle("on", el.dataset.key === state.destinationKey);
+  });
+}
+
+/* ==================== DESTINATION SEARCH ==================== */
+function renderDestDropdown(filter){
+  const dd = document.getElementById("destDropdown");
+  const f = (filter||"").toLowerCase().trim();
+  let list = CITIES;
+  if(f){
+    list = CITIES.filter(c =>
+      c.name.toLowerCase().includes(f) ||
+      c.country.toLowerCase().includes(f) ||
+      c.alias.some(a => a.toLowerCase().includes(f))
+    );
+  }
+  if(list.length===0){
+    dd.innerHTML = '<div class="dest-empty">검색 결과가 없어요</div>';
+    dd.classList.add("on");
+    return;
+  }
+  dd.innerHTML = list.map(c =>
+    `<div class="dest-item" data-key="${c.key}">
+       <span class="flag">${c.flag}</span>
+       <div class="info">
+         <div class="nm">${c.name}</div>
+         <div class="country">${c.country}</div>
+       </div>
+     </div>`
+  ).join("");
+  dd.classList.add("on");
+  dd.querySelectorAll(".dest-item").forEach(el=>{
+    el.onclick = ()=>{ selectDest(el.dataset.key); dd.classList.remove("on"); };
+  });
+}
+function selectDest(key){
+  const c = CITIES.find(x=>x.key===key);
+  if(!c) return;
+  state.destinationKey = key;
+  document.getElementById("destInput").value = c.name + " · " + c.country;
+  document.getElementById("destFlag").textContent = c.flag;
+  document.getElementById("destDropdown").classList.remove("on");
+  updatePopularUI();
+  updateBudget(); // 도시가 바뀌면 예산 티어도 재계산
+}
+function clearDest(){
+  state.destinationKey = "";
+  document.getElementById("destInput").value = "";
+  document.getElementById("destFlag").textContent = "🌏";
+  document.getElementById("destDropdown").classList.remove("on");
+  updatePopularUI();
+  updateBudget();
+}
+
+/* ==================== CALENDAR ==================== */
+function openCal(target){
+  state.calTarget = target;
+  state.pendingStart = state.startDate;
+  state.pendingEnd = state.endDate;
+  // 달력 월을 합리적으로 설정
+  if(state.startDate){
+    const d = parseYmd(state.startDate);
+    state.calMonth = new Date(d.getFullYear(), d.getMonth(), 1);
+  }
+  document.getElementById("calOverlay").classList.add("on");
+  document.getElementById("calTitle").textContent =
+    target==="start" ? "출발일 선택" : "도착일 선택";
+  renderCal();
+}
+function closeCal(){
+  document.getElementById("calOverlay").classList.remove("on");
+}
+function calPrev(){
+  state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth()-1, 1);
+  renderCal();
+}
+function calNext(){
+  state.calMonth = new Date(state.calMonth.getFullYear(), state.calMonth.getMonth()+1, 1);
+  renderCal();
+}
+function renderCal(){
+  const y = state.calMonth.getFullYear();
+  const m = state.calMonth.getMonth();
+  document.getElementById("calMonth").textContent = y+"년 "+(m+1)+"월";
+  const first = new Date(y,m,1);
+  const last = new Date(y,m+1,0);
+  const startDow = first.getDay();
+  const total = last.getDate();
+  const grid = document.getElementById("calGrid");
+  let html = "";
+  for(let i=0;i<startDow;i++){ html += '<div class="cal-cell blank"></div>'; }
+  const today = ymd(new Date(2026,3,18)); // 2026-04-18
+  for(let d=1; d<=total; d++){
+    const dt = new Date(y,m,d);
+    const key = ymd(dt);
+    const dow = dt.getDay();
+    let cls = "cal-cell";
+    if(dow===0) cls += " sun";
+    if(dow===6) cls += " sat";
+    if(HOLIDAYS[key]) cls += " holiday";
+    if(key < today) cls += " past";
+    const ps = state.pendingStart, pe = state.pendingEnd;
+    if(ps && key===ps) cls += " start";
+    if(pe && key===pe) cls += " end";
+    if(ps && pe && key>ps && key<pe) cls += " range";
+    html += `<div class="${cls}" data-key="${key}" onclick="pickDate('${key}')"><span class="dn">${d}</span>${HOLIDAYS[key]?'<span class="htag">'+HOLIDAYS[key]+'</span>':''}</div>`;
+  }
+  grid.innerHTML = html;
+  updateCalInfo();
+}
+function pickDate(key){
+  const today = ymd(new Date(2026,3,18));
+  if(key < today) return;
+  if(state.calTarget==="start"){
+    state.pendingStart = key;
+    if(state.pendingEnd && key > state.pendingEnd) state.pendingEnd = null;
+    state.calTarget = "end";
+    document.getElementById("calTitle").textContent = "도착일 선택";
+  } else {
+    if(!state.pendingStart){
+      state.pendingStart = key;
+      state.calTarget = "end";
+    } else if(key < state.pendingStart){
+      state.pendingStart = key;
+      state.pendingEnd = null;
+    } else {
+      state.pendingEnd = key;
+    }
+  }
+  renderCal();
+}
+function updateCalInfo(){
+  const info = document.getElementById("calInfo");
+  const btn = document.getElementById("calConfirm");
+  if(state.pendingStart && state.pendingEnd){
+    const d = daysBetween(state.pendingStart, state.pendingEnd);
+    info.innerHTML = `<b>${fmtDate(state.pendingStart)}</b> → <b>${fmtDate(state.pendingEnd)}</b> · ${d-1}박 ${d}일`;
+    btn.disabled = false;
+  } else if(state.pendingStart){
+    info.innerHTML = `출발: <b>${fmtDate(state.pendingStart)}</b> · 도착일을 선택하세요`;
+    btn.disabled = true;
+  } else {
+    info.textContent = "출발일을 먼저 선택하세요";
+    btn.disabled = true;
+  }
+}
+function resetCal(){
+  state.pendingStart = null;
+  state.pendingEnd = null;
+  state.calTarget = "start";
+  document.getElementById("calTitle").textContent = "출발일 선택";
+  renderCal();
+}
+function confirmCal(){
+  if(!state.pendingStart || !state.pendingEnd) return;
+  state.startDate = state.pendingStart;
+  state.endDate = state.pendingEnd;
+  const sv = document.getElementById("dfStartVal");
+  const ev = document.getElementById("dfEndVal");
+  sv.textContent = fmtDate(state.startDate);
+  sv.classList.remove("placeholder");
+  ev.textContent = fmtDate(state.endDate);
+  ev.classList.remove("placeholder");
+  const d = daysBetween(state.startDate, state.endDate);
+  document.getElementById("dateInfo").textContent = `총 ${d-1}박 ${d}일 여행`;
+  closeCal();
+  updateBudget(); // 날짜가 바뀌면 일일 예산 기준 티어도 재계산
+}
+
+/* ==================== BUDGET (도시별 동적 티어) ==================== */
+// 도시의 물가 수준 (0=아주 저렴 ~ 4=아주 비쌈)
+const CITY_COST = {
+  // 4: 최상위 (하루 기본 지출 가장 큼)
+  tokyo:4, paris:4, london:4, newyork:4, la:4, sanfrancisco:4, zurich:4,
+  geneva:4, oslo:4, stockholm:4, copenhagen:4, reykjavik:4, dubai:4,
+  monaco:4, zermatt:4, lucerne:4, interlaken:4, honolulu:4, oahu:4,
+  maui:4, sydney:4, melbourne:4, singapore:4, hongkong:4,
+  // 3: 상위권
+  osaka:3, kyoto:3, fukuoka:3, sapporo:3, amsterdam:3, berlin:3,
+  rome:3, barcelona:3, madrid:3, vienna:3, prague:3, dublin:3,
+  helsinki:3, boston:3, chicago:3, seattle:3, sandiego:3, miami:3,
+  vancouver:3, toronto:3, montreal:3, brisbane:3, auckland:3,
+  queenstown:3, telaviv:3, athens:3, santorini:3, venice:3, milan:3,
+  florence:3, munich:3, seoul:3, nice:3, cannes:3, monacoville:3,
+  // 2: 중간(기본)
+  busan:2, jeju:2, incheon:2, shanghai:2, beijing:2, taipei:2,
+  taichung:2, kaohsiung:2, moscow:2, petersburg:2, budapest:2,
+  warsaw:2, krakow:2, lisbon:2, porto:2, valencia:2, sevilla:2,
+  naples:2, bordeaux:2, lyon:2, hamburg:2, frankfurt:2, manchester:2,
+  // 1: 저렴
+  bangkok:1, chiangmai:1, pattaya:1, phuket:1, krabi:1, kohsamui:1,
+  ayutthaya:1, sukhothai:1, kohphangan:1, hochiminh:1, hanoi:1,
+  danang:1, hoian:1, hochiminhdistrict:1, dalat:1, sapa:1, nhatrang:1,
+  phuquoc:1, siemreap:1, vientiane:1, luangprabang:1, kl:1, penang:1,
+  langkawi:1, kotakinabalu:1, bali:1, jakarta:1, yogyakarta:1,
+  lombok:1, manila:1, cebu:1, boracay:1, palawan:1, istanbul:1,
+  cappadocia:1, antalya:1, izmir:1, marrakech:1, cairo:1, fes:1,
+  casablanca:1, bogota:1, medellin:1, lima:1, cusco:1, buenosaires:1,
+  mexico:1, mexicocity:1, oaxaca:1, guadalajara:1, havana:1, cartagena:1,
+  // 0: 아주 저렴
+  bagan:0, mandalay:0, kathmandu:0, varanasi:0, jaipur:0, delhi:0,
+  mumbai:0, goa:0, kerala:0, colombo:0, addis:0, nairobi:0,
+  zanzibar:0, victoriafalls:0
+};
+// 레벨별 "1일 기준" 임계값(만 원). 총 예산을 일수로 나눈 '일일 예산'을 이 값과 비교.
+const PERDAY_TIER = {
+  0: [8,  20,  50],   // 매우 저렴
+  1: [15, 35,  80],   // 저렴
+  2: [25, 55, 120],   // 기본
+  3: [35, 75, 160],   // 상위
+  4: [50, 110, 220]   // 최상위
+};
+function cityCostLevel(key){
+  if(key in CITY_COST) return CITY_COST[key];
+  return 2; // 기본
+}
+function getPerDayThresholds(key){
+  return PERDAY_TIER[cityCostLevel(key)] || PERDAY_TIER[2];
+}
+function currentDays(){
+  if(state && state.startDate && state.endDate){
+    try { return Math.max(1, daysBetween(state.startDate, state.endDate)); } catch(e){}
+  }
+  return 3; // 기본 3일 가정 (날짜 미선택 시)
+}
+function budgetTier(totalMan, cityKey, days){
+  const d = days || currentDays();
+  const perDay = totalMan / d;
+  const [a,b,c] = getPerDayThresholds(cityKey || (state && state.destinationKey));
+  if(perDay < a) return {tier:"low",  label:"가성비", perDay};
+  if(perDay < b) return {tier:"mid",  label:"중간",   perDay};
+  if(perDay < c) return {tier:"high", label:"프리미엄", perDay};
+  return {tier:"lux", label:"럭셔리", perDay};
+}
+function updateBudget(){
+  const el = document.getElementById("budgetSlider");
+  if(!el) return;
+  const v = +el.value;
+  state.budget = v;
+  document.getElementById("budgetAmt").textContent = "₩ " + (v*10000).toLocaleString();
+  const d = currentDays();
+  const t = budgetTier(v, state.destinationKey, d);
+  const tierEl = document.getElementById("budgetTier");
+  tierEl.textContent = t.label;
+  tierEl.className = "budget-tier " + t.tier;
+}
+
+/* ==================== FORM SUBMIT ==================== */
+function submitForm(){
+  const err = document.getElementById("formErr");
+  err.textContent = "";
+  err.classList.remove("on");
+  function showErr(msg){ err.textContent = msg; err.classList.add("on"); }
+  if(!state.destinationKey){ showErr("목적지를 선택해주세요"); return; }
+  if(!state.startDate || !state.endDate){ showErr("여행 날짜를 선택해주세요"); return; }
+  if(state.styles.length===0){ showErr("여행 스타일을 하나 이상 선택해주세요"); return; }
+  go("loading");
+  runLoading();
+}
+
+/* ==================== LOADING ==================== */
+function runLoading(){
+  let sec = 3;
+  const numEl = document.getElementById("timerNum");
+  numEl.textContent = sec;
+  const items = document.querySelectorAll("#lsList .ls");
+  let step = 0;
+  items.forEach((it,i)=>{ it.className = "ls " + (i===0?"doing":"idle"); });
+  const timer = setInterval(()=>{
+    sec--;
+    if(sec>=0) numEl.textContent = sec;
+    step++;
+    items.forEach((it,i)=>{
+      if(i<step) it.className="ls done";
+      else if(i===step) it.className="ls doing";
+      else it.className="ls idle";
+    });
+    if(sec<=0){
+      clearInterval(timer);
+      finalizeGenerate();
+    }
+  },1000);
+}
+
+async function finalizeGenerate(){
+  try{
+    if(state.apiKey && state.apiKey.startsWith("sk-")){
+      state.generated = await callGPT();
+    } else {
+      state.generated = getDemoData();
+    }
+  }catch(e){
+    console.error(e);
+    state.generated = getDemoData();
+  }
+  renderResult();
+  go("result");
+}
+
+/* ==================== GPT CALL ==================== */
+async function callGPT(){
+  const city = CITIES.find(c=>c.key===state.destinationKey);
+  const d = daysBetween(state.startDate, state.endDate);
+  const prompt = `당신은 현지 여행 전문가입니다. 아래 조건으로 JSON 일정을 만들어주세요.
+- 도시: ${city.name} (${city.country})
+- 기간: ${state.startDate} ~ ${state.endDate} (${d-1}박 ${d}일)
+- 예산: 1인 ${state.budget}만원
+- 스타일: ${state.styles.join(", ")}
+- 동행: ${state.companion}
+- 반드시 "현지인 방문 비율 70%+" 장소 위주로
+응답 포맷(JSON만):
+{"title":"…","summary":"…","days":[{"day":1,"date":"...","theme":"...","activities":[{"time":"10:00","name":"…","category":"…","location":"…","description":"…","localRatio":0.85,"crowd":"high/mid/low","duration":"1h","cost":"₩30,000"}]}]}`;
+  const r = await fetch("https://api.openai.com/v1/chat/completions",{
+    method:"POST",
+    headers:{ "Authorization":"Bearer "+state.apiKey, "Content-Type":"application/json" },
+    body: JSON.stringify({
+      model: state.model,
+      messages:[{role:"system",content:"Return JSON only, no markdown."},{role:"user",content:prompt}],
+      response_format:{type:"json_object"},
+      temperature:0.9
+    })
+  });
+  const j = await r.json();
+  return JSON.parse(j.choices[0].message.content);
+}
+
+/* ==================== GENERIC PLACES (DB에 없는 도시용 자동 생성) ==================== */
+// 실제 가게명 느낌의 후보들 (도시별 seed로 고정 선택)
+const GENERIC_NAMES = {
+  cafe:      ["Cafe Lumière","Morning Bell Coffee","Corner Cup Roasters","Brew & Bean","Roastery No.7","The Daily Grind","Espresso Bar 21","Little Coffee House","Kahvi & Co.","Third Wave Coffee Lab"],
+  brunch:    ["Sunday Brunch Co.","Eggs & Things Kitchen","Garden Brunch House","Fork & Knife Café","Bistro du Matin","The Breakfast Club","Morning Plate"],
+  specialty: ["Onibus Roastery","Fuglen Annex","Blue Oak Coffee","Single Origin Lab","Bean & Barrel Roasters","Kaffa Specialty","Ember Coffee Works"],
+  teahouse:  ["Old Tea House","Jasmine & Co.","Teapot Room","Verdant Tea Salon","Kiln Teahouse"],
+  marketAM:  ["Old Town Morning Market","Plaza Market Hall","Central Souk","Saturday Farmers Market","Harbor Fish Market","Daily Bazaar"],
+  marketPM:  ["Lantern Night Market","Main Street Night Market","Riverside Night Bazaar","Bell Night Food Street"],
+  streetFood:["Alley Food Corner","Back Street Eats","Old Quarter Skewer Street","Red Lantern Food Lane","Corner Dumpling Stand"],
+  nopo:      ["Nonna's Kitchen","Old Tavern 1922","House of Noodles","Grandma's Kitchen","The Oldtown Diner","Taverna Modica","Mama Rosa"],
+  michelin:  ["La Cuchara Bib","Ember Bib Gourmand","Chez Georges","Little Kitchen Bib","Sel & Poivre","Atelier Bouchon"],
+  winebistro:["La Cave Bistro","Le Petit Sommelier","Wine & Dine No.14","Cellar 88","The Vineyard Room","Vin & Verre"],
+  finedining:["Atelier Saison","Maison Lumière","Kitchen 88","The Chef's Table","Chez Moreau","Hinoki Fine Dining","Nord Tasting Room"],
+  tapas:     ["La Taberna","Vermut & Tapas","Pincho & Co.","El Rincón de Tapas","Olive Bar"],
+  ramen:     ["Menya Kaiseki","Men Ya House","Soba & Ramen Co.","Yatai Ramen Stand","Ramen Night Lab"],
+  culture:   ["Old Quarter Walk","Cathedral Square Tour","Heritage District","Castle Gate Promenade","Old Port Walk"],
+  museum:    ["City Historical Museum","Maritime Museum","National Archives Museum","Royal History Museum","People's Museum"],
+  artGallery:["Studio Gallery House","Modern Art Collective","Riverside Art Museum","Atelier Art Space","Gallery Lane Collective"],
+  performance:["Lyric Playhouse","Traditional Arts Stage","The Opera House Hall","Folklore Theater","Harbor Concert Hall"],
+  shoppingSt:["Main Shopping Avenue","Designer Lane","Crown Plaza Shopping","Bond Street District","High Street Promenade"],
+  vintage:   ["Flea Market Lane","Second Story Vintage","Retro Finds Alley","Blue Door Vintage","Grandpa's Closet"],
+  departmentFood:["Crown Gourmet Hall","The Food Arcade","Gastronomic Floor 7","Prime Deli Market"],
+  park:      ["Central City Park","Riverside Park","Green Lawn Gardens","Lakeside Park","People's Park"],
+  botanical: ["Botanical Gardens","City Greenhouse","Royal Conservatory","Sun Lily Gardens"],
+  beach:     ["Sunset Beach Walk","Harbor Bay Promenade","Crescent Beach","Old Pier Boardwalk"],
+  observatory:["Skyline Observatory","Crown Tower View","Hilltop Viewpoint","Horizon Deck"],
+  cable:     ["Skyway Cable Car","Mountain View Gondola","Harbor Cableway"],
+  rooftop:   ["Skybar 360","Sunset Rooftop Lounge","Terrace & Co.","High Note Rooftop"],
+  jazz:      ["Blue Note Room","Midnight Groove","Mellow Jazz Bar","Smokestack Jazz Club"],
+  brewery:   ["Northside Brewing","Harbor Craft Brewery","Wild Hops Brewing Co.","Old Barrel Brewery"],
+  nightwalk: ["Riverside Night Walk","Bridge Walk Promenade","Lantern Alley Walk","Old Pier Night Stroll"],
+  pocha:     ["Lucky Star Pocha","Late-Night Pocha","Corner Food Stand","Back Alley Pojangmacha"],
+  latenight: ["24hr Ramen Stand","Midnight Kitchen","Always Open Diner","All-Night Noodle Bar"],
+  oceanCafe: ["Oceanview Morning Cafe","Bay Breeze Cafe","Sea Salt Coffee","Harbor Light Cafe"],
+  hotelMid:  ["The Courtyard Boutique","Central Park Inn","Midtown Suites","The Heritage Hotel","Plaza Garden Hotel"],
+  hostel:    ["Backpackers Lounge","Urban Bunk House","Sunrise Hostel","Central Travelers Hostel"],
+  hotelLux:  ["Grand Majestic Hotel","The Landmark Suites","Royal Crown Hotel","The Premier Palace","Capital Grand Hotel"],
+  bikeTour:  ["City Cycle Tour","Urban Bike Tour","Pedal Explorer Tour","Downtown Bike Loop"],
+  cookClass: ["Hands-On Cooking Studio","Local Kitchen Class","The Home Kitchen Workshop","Chef's Table Class"],
+  spa:       ["Urban Wellness Spa","Tranquil Day Spa","Retreat Spa Club","Oasis Thermal Spa"],
+  busTour:   ["Hop-On Hop-Off City Tour","Open-Top City Bus Tour","Panorama Bus Tour"]
+};
+function getGenericPlaces(city){
+  const n = city.name;
+  const h = _hash(city.key||n||"city");
+  // seed 기반으로 카테고리마다 다른 이름을 뽑되, 도시가 달라지면 다른 이름 조합이 나오도록
+  const pick = (key, off)=>{
+    const arr = GENERIC_NAMES[key] || [key];
+    return arr[((h*11) + off*2654435761) >>> 0 & 0xffffffff ? (((h*11)+off*2654435761)>>>0) % arr.length : 0];
+  };
+  // 호텔 이름은 도시명을 포함 (현실적) — "The Landmark Suites 포항" 처럼
+  const hotelMid = pick("hotelMid",1) + " " + n;
+  const hotelLux = pick("hotelLux",2) + " " + n;
+  const hostel   = pick("hostel",3) + " " + n;
+
+  return [
+    { name:pick("cafe",10), emoji:"☕", photo:"cafe", cat:"카페", desc:"현지인의 아침 시작점, 갓 구운 빵과 에스프레소", local:0.92, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"₩6,000" },
+    { name:pick("brunch",11), emoji:"🥐", photo:"cafe", cat:"브런치", desc:"주말 줄 서는 동네 브런치", local:0.85, crowd:"mid", time:["morning"], budget:"mid", cost:"₩18,000" },
+    { name:pick("marketAM",12), emoji:"🥬", photo:"market", cat:"시장", desc:"새벽부터 활기, 즉석 음식 가능", local:0.95, crowd:"high", time:["morning"], budget:"low", cost:"₩5,000" },
+    { name:pick("nopo",13), emoji:"🍜", photo:"food", cat:"노포 맛집", desc:"3대째 운영 현지 식당", local:0.93, crowd:"high", note:"웨이팅 30분", time:["lunch","dinner"], budget:"low", cost:"₩12,000" },
+    { name:pick("michelin",14), emoji:"🍽️", photo:"food", cat:"맛집", desc:"가성비 미슐랭 빕구르망", local:0.78, crowd:"high", time:["lunch","dinner"], budget:"mid", cost:"₩35,000" },
+    { name:pick("streetFood",15), emoji:"🥟", photo:"asianfood", cat:"길거리 음식", desc:"현지인 점심 핫스팟", local:0.9, crowd:"mid", time:["lunch"], budget:"low", cost:"₩8,000" },
+    { name:pick("culture",16), emoji:"🏛️", photo:"culture", cat:"역사 지구", desc:"옛 골목과 광장 도보 코스", local:0.6, crowd:"mid", time:["afternoon","morning"], budget:"low", cost:"무료" },
+    { name:pick("museum",17), emoji:"🖼️", photo:"culture", cat:"박물관", desc:"도시 역사를 한눈에", local:0.55, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"₩12,000" },
+    { name:pick("artGallery",18), emoji:"🎨", photo:"culture", cat:"미술관", desc:"기획전이 자주 바뀜", local:0.68, crowd:"low", time:["afternoon"], budget:"mid", cost:"₩18,000" },
+    { name:pick("shoppingSt",19), emoji:"🛍️", photo:"shopping", cat:"쇼핑", desc:"로컬 디자이너 + SPA 브랜드", local:0.5, crowd:"high", time:["afternoon"], budget:"mid", cost:"가변" },
+    { name:pick("observatory",20), emoji:"🌆", photo:"nature", cat:"전망", desc:"일몰 시간 추천", local:0.4, crowd:"high", time:["afternoon","night"], budget:"mid", cost:"₩25,000" },
+    { name:pick("park",21), emoji:"🌳", photo:"nature", cat:"공원", desc:"피크닉 즐기는 가족 단위", local:0.85, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"무료" },
+    { name:pick("winebistro",22), emoji:"🍷", photo:"food", cat:"비스트로", desc:"현지 와이너리 컬렉션", local:0.8, crowd:"mid", time:["dinner"], budget:"high", cost:"₩60,000" },
+    { name:pick("finedining",23), emoji:"🍝", photo:"food", cat:"파인다이닝", desc:"제철 식재료 코스", local:0.65, crowd:"mid", note:"예약 필수", time:["dinner"], budget:"high", cost:"₩90,000" },
+    { name:pick("marketPM",24), emoji:"🏮", photo:"market", cat:"야시장", desc:"길거리 음식 + 라이브 음악", local:0.9, crowd:"high", time:["dinner","night"], budget:"low", cost:"₩15,000" },
+    { name:pick("rooftop",25), emoji:"🍸", photo:"night", cat:"바", desc:"360도 야경", local:0.55, crowd:"mid", time:["night"], budget:"high", cost:"₩30,000" },
+    { name:pick("nightwalk",26), emoji:"🌃", photo:"night", cat:"산책", desc:"무료 야경 명소", local:0.85, crowd:"low", time:["night"], budget:"low", cost:"무료" },
+    { name:pick("jazz",27), emoji:"🎷", photo:"night", cat:"공연", desc:"매일 라이브 셋", local:0.75, crowd:"mid", time:["night"], budget:"mid", cost:"₩25,000" },
+    { name:hotelMid, emoji:"🏨", photo:"hotel", cat:"호텔", desc:"시내 중심, 도보 5분 지하철역", local:0.6, crowd:"low", time:["night"], budget:"mid", cost:"₩140,000/박" },
+    { name:hostel,  emoji:"🛏️", photo:"hotel", cat:"호스텔", desc:"가성비 좋고 세련된 인테리어", local:0.5, crowd:"low", time:["night"], budget:"low", cost:"₩45,000/박" },
+    { name:hotelLux, emoji:"🏛️", photo:"hotel", cat:"호텔", desc:"수영장과 스파, 시그니처 다이닝", local:0.4, crowd:"low", time:["night"], budget:"lux", cost:"₩520,000/박" },
+    { name:pick("bikeTour",28), emoji:"🚴", photo:"activity", cat:"투어", desc:"3시간 가이드 자전거 투어", local:0.6, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"₩45,000" },
+    { name:pick("cookClass",29), emoji:"👨‍🍳", photo:"activity", cat:"클래스", desc:"현지 전통 음식 배우기", local:0.7, crowd:"low", time:["afternoon"], budget:"high", cost:"₩80,000" },
+
+    /* ===== 확장 풀: 더 긴 여행을 위한 다양한 슬롯 ===== */
+    { name:pick("specialty",30), emoji:"☕", photo:"cafe", cat:"스페셜티 카페", desc:"자가 로스팅 원두", local:0.8, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"₩9,000" },
+    { name:pick("beach",31), emoji:"🏖️", photo:"beach", cat:"해안", desc:"일출/일몰 명소", local:0.7, crowd:"low", time:["morning","afternoon","night"], budget:"low", cost:"무료" },
+    { name:pick("culture",32), emoji:"⛩️", photo:"culture", cat:"유적지", desc:"지역 대표 종교·역사 유적", local:0.6, crowd:"mid", time:["morning","afternoon"], budget:"low", cost:"₩10,000" },
+    { name:pick("botanical",33), emoji:"🌿", photo:"nature", cat:"정원", desc:"계절 꽃 산책", local:0.5, crowd:"low", time:["morning","afternoon"], budget:"low", cost:"₩8,000" },
+    { name:pick("teahouse",34), emoji:"🍵", photo:"cafe", cat:"찻집", desc:"현지식 다도 체험", local:0.85, crowd:"low", time:["afternoon"], budget:"low", cost:"₩12,000" },
+    { name:pick("tapas",35), emoji:"🍤", photo:"food", cat:"타파스", desc:"작은 접시로 여러 가지", local:0.75, crowd:"mid", time:["dinner","night"], budget:"mid", cost:"₩30,000" },
+    { name:pick("streetFood",36), emoji:"🌮", photo:"asianfood", cat:"푸드 투어", desc:"가이드와 함께 5곳 방문", local:0.88, crowd:"mid", time:["dinner","afternoon"], budget:"mid", cost:"₩55,000" },
+    { name:pick("marketAM",37), emoji:"🍳", photo:"market", cat:"시장 브런치", desc:"즉석 요리 먹방 코스", local:0.9, crowd:"high", time:["morning","lunch"], budget:"low", cost:"₩10,000" },
+    { name:pick("vintage",38), emoji:"👗", photo:"shopping", cat:"빈티지", desc:"레어 아이템 사냥", local:0.7, crowd:"mid", time:["afternoon"], budget:"mid", cost:"가변" },
+    { name:pick("departmentFood",39), emoji:"🥡", photo:"shopping", cat:"쇼핑", desc:"고급 델리와 기념품", local:0.55, crowd:"mid", time:["afternoon"], budget:"mid", cost:"가변" },
+    { name:pick("spa",40), emoji:"🧖", photo:"activity", cat:"스파", desc:"여행 피로 회복", local:0.5, crowd:"low", time:["afternoon","night"], budget:"high", cost:"₩70,000" },
+    { name:pick("winebistro",41), emoji:"🍇", photo:"night", cat:"와인바", desc:"라이브 공연", local:0.7, crowd:"mid", time:["night"], budget:"high", cost:"₩45,000" },
+    { name:pick("ramen",42), emoji:"🍥", photo:"asianfood", cat:"심야식당", desc:"새벽까지 영업", local:0.85, crowd:"mid", time:["night","dinner"], budget:"low", cost:"₩14,000" },
+    { name:pick("pocha",43), emoji:"🍻", photo:"night", cat:"포차", desc:"현지인 술자리 분위기", local:0.9, crowd:"high", time:["night"], budget:"low", cost:"₩18,000" },
+    { name:pick("oceanCafe",44), emoji:"🥞", photo:"cafe", cat:"오션뷰 카페", desc:"뷰 맛집", local:0.65, crowd:"mid", time:["morning"], budget:"mid", cost:"₩22,000" },
+    { name:pick("cable",45), emoji:"🚠", photo:"activity", cat:"관광", desc:"도시/산 전망", local:0.55, crowd:"mid", time:["morning","afternoon"], budget:"mid", cost:"₩32,000" },
+    { name:pick("brewery",46), emoji:"🍺", photo:"night", cat:"수제맥주", desc:"IPA, 스타우트 테이스팅", local:0.78, crowd:"mid", time:["night","dinner"], budget:"mid", cost:"₩28,000" },
+    { name:pick("artGallery",47), emoji:"🖌️", photo:"culture", cat:"갤러리", desc:"현대 작가 상설전", local:0.6, crowd:"low", time:["afternoon"], budget:"low", cost:"무료" },
+    { name:pick("busTour",48), emoji:"🚌", photo:"activity", cat:"시티투어", desc:"주요 명소 한 번에", local:0.4, crowd:"high", time:["morning","afternoon"], budget:"mid", cost:"₩40,000" },
+    { name:pick("performance",49), emoji:"🎭", photo:"culture", cat:"공연", desc:"지역 민속/전통 퍼포먼스", local:0.75, crowd:"mid", time:["night","dinner"], budget:"mid", cost:"₩35,000" }
+  ];
+}
+
+/* ==================== AIRLINE 추천 ==================== */
+function recommendFlight(city, budget, dir){
+  // 거리/예산에 따라 항공사 추천
+  const farKeys = ["paris","london","newyork","la","sanfrancisco","rome","barcelona","madrid","berlin","munich","amsterdam","zurich","istanbul","dubai","cairo","capetown","sydney","melbourne","auckland","mexicocity","cancun","rio","buenosaires","reykjavik","helsinki","prague","vienna","budapest","athens","santorini","marrakech","moscow","petersburg","lasvegas","chicago","miami","boston","seattle","portland","honolulu"];
+  const isFar = farKeys.includes(city.key) || /미국|영국|프랑스|독일|이탈리아|스페인|UAE|튀르키예|이집트|남아공|호주|뉴질랜드|브라질|아르헨티나|페루|칠레|쿠바|아이슬란드|러시아|모로코|캐나다|멕시코/.test(city.country);
+  const tier = budgetTier(budget).tier;
+  let airlines, time, duration, price;
+  if(tier === "lux" || tier === "high"){
+    airlines = ["대한항공 KE","아시아나 OZ"][Math.floor(Math.random()*2)];
+    time = isFar ? "10:30" : "09:00";
+    duration = isFar ? "12시간 직항" : "3시간 직항";
+    price = isFar ? Math.round(budget*4500).toLocaleString() : Math.round(budget*2500).toLocaleString();
+  } else if(tier === "mid"){
+    airlines = ["진에어 LJ","제주항공 7C","에어부산 BX","티웨이 TW"][Math.floor(Math.random()*4)];
+    time = isFar ? "13:00" : "10:00";
+    duration = isFar ? "13시간 1회 경유" : "3시간 직항";
+    price = isFar ? Math.round(budget*3500).toLocaleString() : Math.round(budget*1800).toLocaleString();
+  } else {
+    airlines = ["스쿠트 TR","에어아시아 D7","비엣젯 VJ","춘추 9C"][Math.floor(Math.random()*4)];
+    time = isFar ? "23:00" : "06:00";
+    duration = isFar ? "16시간 2회 경유" : "4시간 LCC";
+    price = isFar ? Math.round(budget*3000).toLocaleString() : Math.round(budget*1500).toLocaleString();
+  }
+  if(dir === "back"){
+    return {
+      airline: airlines,
+      route: city.name+" → 인천(ICN)",
+      time: isFar ? "21:00" : "19:30",
+      duration,
+      price: "왕복 포함"
+    };
+  }
+  return {
+    airline: airlines,
+    route: "인천(ICN) → "+city.name,
+    time, duration,
+    price: "₩"+price+" (왕복)"
+  };
+}
+
+/* ==================== DEMO DATA (호텔 고정 + 항공편 포함) ==================== */
+function getDemoData(){
+  const city = CITIES.find(c=>c.key===state.destinationKey);
+  const totalDays = daysBetween(state.startDate, state.endDate);
+  const tier = budgetTier(state.budget).tier;
+
+  // 풀 구성: 도시 전용 DB + (8개 미만이면) 일반 템플릿 보강
+  let pool = (PLACES[state.destinationKey]||[]).slice();
+  if(pool.length < 10) pool = pool.concat(getGenericPlaces(city));
+
+  // 예산 필터
+  const tierRank = {low:0, mid:1, high:2, lux:3};
+  const okTiers = Object.keys(tierRank).filter(k=>tierRank[k] <= tierRank[tier]+1);
+  let filtered = pool.filter(p => okTiers.includes(p.budget));
+  if(filtered.length < 10) filtered = pool;
+
+  // 호텔/일반 분리
+  const isHotel = p => /호텔|호스텔|숙박|리조트|료칸|hotel|hostel|resort/i.test(p.cat||"");
+  const hotels = filtered.filter(isHotel);
+  const actPool = filtered.filter(p => !isHotel(p));
+
+  // 시드 PRNG
+  const seedStr = state.destinationKey + state.startDate + state.budget + state.styles.join("") + state.companion;
+  let seed = 0;
+  for(let i=0;i<seedStr.length;i++) seed = (seed*31 + seedStr.charCodeAt(i))>>>0;
+  function rand(){ seed = (seed*9301 + 49297)%233280; return seed/233280; }
+
+  // 여행 내내 머무를 호텔 1개 픽 (예산 티어와 가장 잘 맞는 것)
+  const tierMatchedHotels = hotels.filter(h => h.budget === tier);
+  const hotelPool = tierMatchedHotels.length ? tierMatchedHotels : (hotels.length ? hotels : [{
+    name: city.name+" 시내 부티크 호텔", emoji:"🏨", photo:"hotel", cat:"호텔",
+    desc:"중심가 도보권, 4성급",
+    local:0.6, crowd:"low", time:["night"], budget:"mid", cost:"₩140,000/박"
+  }]);
+  const hotel = hotelPool[Math.floor(rand()*hotelPool.length)];
+
+  // 항공편 추천
+  const flightOut = recommendFlight(city, state.budget, "out");
+  const flightBack = recommendFlight(city, state.budget, "back");
+
+  // 호텔 지역(여행 내내 동일)
+  const hotelArea = hotel.area || _pickArea(city, "hotel", hotel.name);
+
+  function actCard(time, slot, p){
+    if(!p) return null;
+    const area = p.area || _pickArea(city, p.photo||"activity", p.name);
+    return {
+      time, slot,
+      name: p.name, emoji: p.emoji, photo: p.photo,
+      category: p.cat,
+      area: area,
+      location: fullLocation(area, city),
+      description: p.desc, localRatio: p.local, crowd: p.crowd,
+      note: p.note||"", duration: "약 1h 30m", cost: p.cost||"-"
+    };
+  }
+  function flightCard(time, slot, f, label){
+    return {
+      time, slot,
+      name: label+": "+f.route,
+      emoji: slot==="flight_out"?"✈️":"🛬",
+      photo: "airport",
+      category: "항공편 ("+f.airline+")",
+      area: city.name+" 국제공항",
+      location: city.name+" 국제공항 ("+(f.airline||"")+")",
+      description: f.duration+" · 체크인은 출발 2시간 전 권장",
+      localRatio: 0,
+      crowd: "mid",
+      note: f.duration,
+      duration: f.duration,
+      cost: f.price
+    };
+  }
+  function hotelCard(time, label){
+    return {
+      time, slot:"hotel",
+      name: label+": "+hotel.name,
+      emoji:"🏨", photo:"hotel",
+      category: hotel.cat||"호텔",
+      area: hotelArea,
+      location: fullLocation(hotelArea, city),
+      description: hotel.desc||"이 여행 동안 머무는 숙소",
+      localRatio: hotel.local||0.6,
+      crowd: hotel.crowd||"low",
+      note: "여행 동안 동일 호텔 이용",
+      duration: "숙박",
+      cost: hotel.cost||"₩140,000/박"
+    };
+  }
+
+  // ===== 전체 일정에서 중복 방지 (엄격) =====
+  const usedNames = new Set([hotel.name]);
+
+  // 시간대 간 대체 우선순위 (인접 시간대로 흘러가도 자연스럽게)
+  const neighborSlots = {
+    morning:   ["morning","lunch","afternoon"],
+    lunch:     ["lunch","dinner","afternoon"],
+    afternoon: ["afternoon","morning","lunch"],
+    dinner:    ["dinner","lunch","night"],
+    night:     ["night","dinner","afternoon"]
+  };
+
+  // 풀 충분히 크게 만들기: 전용 DB + 제네릭 템플릿 항상 병합
+  const extra = getGenericPlaces(city).filter(g => !actPool.some(p => p.name === g.name) && !isHotel(g));
+  const bigPool = actPool.concat(extra);
+
+  function pickActivity(slot, dayUsed){
+    dayUsed = dayUsed || new Set();
+    const noConflict = p => !dayUsed.has(p.name); // 같은 날 같은 장소는 절대 금지
+    // 1) 정확한 시간대 + 전체 미사용
+    let cand = bigPool.filter(p => p.time && p.time.includes(slot) && !usedNames.has(p.name) && noConflict(p));
+    // 2) 인접 시간대 + 전체 미사용
+    if(cand.length === 0){
+      const alts = neighborSlots[slot] || [slot];
+      cand = bigPool.filter(p => p.time && alts.some(s=>p.time.includes(s)) && !usedNames.has(p.name) && noConflict(p));
+    }
+    // 3) 시간대 무관, 전체 미사용
+    if(cand.length === 0) cand = bigPool.filter(p => !usedNames.has(p.name) && noConflict(p));
+    // 4) 풀이 동났을 때 — 같은 날 중복만 피하고 시간대 일치 우선
+    if(cand.length === 0) cand = bigPool.filter(p => p.time && p.time.includes(slot) && noConflict(p));
+    if(cand.length === 0){
+      const alts = neighborSlots[slot] || [slot];
+      cand = bigPool.filter(p => p.time && alts.some(s=>p.time.includes(s)) && noConflict(p));
+    }
+    if(cand.length === 0) cand = bigPool.filter(noConflict);
+    if(cand.length === 0) cand = bigPool.length ? bigPool : actPool;
+    const pick = cand[Math.floor(rand()*cand.length)];
+    if(pick){ usedNames.add(pick.name); dayUsed.add(pick.name); }
+    return pick;
+  }
+
+  const days = [];
+  for(let di=0; di<totalDays; di++){
+    const dayDate = new Date(parseYmd(state.startDate).getTime() + di*86400000);
+    const acts = [];
+    const isFirst = di === 0;
+    const isLast  = di === totalDays-1;
+    const dayUsed = new Set();  // 오늘 이미 쓴 장소 (같은 날 중복 금지)
+
+    if(totalDays === 1){
+      // 당일치기: 항공만 (숙박 없음)
+      acts.push(flightCard("06:30","flight_out",flightOut,"출국"));
+      acts.push(actCard("11:30","lunch",pickActivity("lunch",dayUsed)));
+      acts.push(actCard("14:00","afternoon",pickActivity("afternoon",dayUsed)));
+      acts.push(actCard("17:30","dinner",pickActivity("dinner",dayUsed)));
+      acts.push(flightCard("21:00","flight_back",flightBack,"귀국"));
+    } else if(isFirst){
+      // 첫째 날: 출국 → 점심 → 체크인(호텔) → 오후 → 저녁 → 야경 → 호텔 취침
+      acts.push(flightCard(flightOut.time,"flight_out",flightOut,"출국"));
+      acts.push(actCard("13:30","lunch",pickActivity("lunch",dayUsed)));
+      acts.push(hotelCard("15:30","호텔 체크인"));            // 낮의 시작(호텔)
+      acts.push(actCard("17:00","afternoon",pickActivity("afternoon",dayUsed)));
+      acts.push(actCard("19:30","dinner",pickActivity("dinner",dayUsed)));
+      acts.push(actCard("21:30","night",pickActivity("night",dayUsed)));
+      acts.push(hotelCard("23:30","호텔 취침"));              // 하루 끝(호텔)
+    } else if(isLast){
+      // 마지막 날: 호텔 기상 → 아침 → 점심 → 오후 → 체크아웃(호텔) → 귀국
+      acts.push(hotelCard("07:30","호텔 기상"));              // 하루 시작(호텔)
+      acts.push(actCard("09:00","morning",pickActivity("morning",dayUsed)));
+      acts.push(actCard("12:00","lunch",pickActivity("lunch",dayUsed)));
+      acts.push(actCard("14:30","afternoon",pickActivity("afternoon",dayUsed)));
+      acts.push(hotelCard("17:00","호텔 체크아웃"));          // 하루 끝 전 호텔
+      acts.push(flightCard(flightBack.time,"flight_back",flightBack,"귀국"));
+    } else {
+      // 중간 날: 호텔 기상 → 오전 → 점심 → 오후 → 저녁 → 야경 → 호텔 취침
+      acts.push(hotelCard("07:30","호텔 기상"));              // 하루 시작(호텔)
+      acts.push(actCard("09:00","morning",pickActivity("morning",dayUsed)));
+      acts.push(actCard("12:30","lunch",pickActivity("lunch",dayUsed)));
+      acts.push(actCard("15:00","afternoon",pickActivity("afternoon",dayUsed)));
+      acts.push(actCard("19:00","dinner",pickActivity("dinner",dayUsed)));
+      acts.push(actCard("21:30","night",pickActivity("night",dayUsed)));
+      acts.push(hotelCard("23:30","호텔 취침"));              // 하루 끝(호텔)
+    }
+
+    days.push({
+      day: di+1,
+      date: ymd(dayDate),
+      theme: isFirst ? "도착 & 체크인"
+            : isLast ? "마무리 & 귀국"
+            : "핵심 탐험",
+      activities: acts.filter(Boolean)
+    });
+  }
+
+  // 통계
+  const onlyPlaces = days.flatMap(d=>d.activities).filter(a=>a.localRatio>0 && a.slot!=="hotel" && !a.slot.startsWith("flight"));
+  const avgLocal = onlyPlaces.length ? Math.round((onlyPlaces.reduce((s,a)=>s+a.localRatio,0)/onlyPlaces.length)*100) : 0;
+
+  return {
+    title: city.name + " "+(totalDays-1)+"박"+totalDays+"일 · 현지인 루트",
+    summary: "예산 "+state.budget+"만원 · "+state.styles.length+"개 스타일",
+    city: city.name,
+    country: city.country,
+    flag: city.flag,
+    avgLocal,
+    totalPlaces: onlyPlaces.length,
+    days,
+    hotel,
+    flight: { out: flightOut, back: flightBack }
+  };
+}
+
+/* ==================== RESULT RENDER ==================== */
+function renderResult(){
+  const g = state.generated;
+  document.getElementById("resTitle").textContent = g.title;
+  document.getElementById("resSub").textContent =
+    g.flag+" "+g.city+" · "+fmtDate(state.startDate)+" ~ "+fmtDate(state.endDate);
+  document.getElementById("stPlaces").textContent = g.totalPlaces;
+  document.getElementById("stLocal").textContent = g.avgLocal + "%";
+  document.getElementById("stDays").textContent = g.days.length;
+
+  const tabs = document.getElementById("dayTabs");
+  tabs.innerHTML = g.days.map((d,i)=>
+    `<div class="day-tab ${i===0?'on':''}" onclick="switchDay(${i})" data-i="${i}">Day ${d.day}</div>`
+  ).join("");
+  state.activeDay = 0;
+  renderDay(0);
+}
+function switchDay(i){
+  state.activeDay = i;
+  document.querySelectorAll(".day-tab").forEach(t=>t.classList.toggle("on",+t.dataset.i===i));
+  renderDay(i);
+}
+function renderDay(i){
+  const day = state.generated.days[i];
+  const cont = document.getElementById("dayContent");
+  let html = `<div style="padding:12px 18px 6px;font-size:12px;color:#777">${fmtDate(day.date)} · ${day.theme}</div>`;
+  html += '<div class="timeline">';
+  day.activities.forEach((a,idx)=>{
+    const crowdCls = a.crowd==="high"?"red":(a.crowd==="mid"?"orange":"green");
+    const crowdTxt = a.crowd==="high"?"혼잡":(a.crowd==="mid"?"보통":"여유");
+    const imgSrc = photoUrl(a);
+    const imgFb = photoUrlFallback(a).replace(/"/g,'&quot;');
+    html += `<div class="tl-item" onclick="openDetail(${i},${idx})">
+      <div class="tl-time">${a.time}</div>
+      <div class="tl-card">
+        <div class="tl-photo photo-${a.photo}">
+          <img class="tl-img" loading="lazy" alt="${(a.name||'').replace(/"/g,'&quot;')}"
+               src="${imgSrc}"
+               onload="this.classList.add('loaded')"
+               onerror="if(this.dataset.fb){this.remove();}else{this.dataset.fb=1;this.src='${imgFb}';}">
+          <span class="emoji">${a.emoji}</span>
+          <span class="badge">${a.cost}</span>
+        </div>
+        <div class="tl-body">
+          <div class="name">${a.name}</div>
+          <div class="cat">${a.category} · ${a.location}</div>
+          ${a.description?`<div class="note">${a.description}</div>`:""}
+          <div class="metrics">
+            <span class="pill green">로컬 ${Math.round(a.localRatio*100)}%</span>
+            <span class="pill ${crowdCls}">${crowdTxt}</span>
+            ${a.note?`<span class="pill">${a.note}</span>`:""}
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  cont.innerHTML = html;
+}
+
+/* ==================== DETAIL ==================== */
+function openDetail(di, ai){
+  const a = state.generated.days[di].activities[ai];
+  state.activeActivity = a;
+  document.getElementById("dtEmoji").textContent = a.emoji;
+  const hero = document.getElementById("dtHero");
+  hero.className = "dt-hero photo-"+a.photo;
+  // 기존 이미지 제거 후 새로 삽입
+  const old = hero.querySelector(".dt-img");
+  if(old) old.remove();
+  const img = document.createElement("img");
+  img.className = "dt-img";
+  img.alt = a.name||"";
+  img.loading = "lazy";
+  img.onload = ()=>img.classList.add("loaded");
+  img.onerror = ()=>{
+    if(img.dataset.fb){ img.remove(); return; }
+    img.dataset.fb = "1";
+    img.src = photoUrlFallback(a);
+  };
+  img.src = photoUrl(a);
+  hero.insertBefore(img, hero.firstChild);
+  document.getElementById("dtName").textContent = a.name;
+  document.getElementById("dtLoc").textContent = a.category+" · "+a.location;
+  document.getElementById("dtDesc").textContent = a.description;
+  const local = Math.round(a.localRatio*100);
+  document.getElementById("dtLocal").textContent = local+"%";
+  document.getElementById("dtLocalBar").style.width = local+"%";
+  const crowdTxt = a.crowd==="high"?"혼잡":(a.crowd==="mid"?"보통":"여유");
+  document.getElementById("dtCrowd").textContent = crowdTxt;
+  document.getElementById("dtCrowdSub").textContent = a.note || "실시간 데이터";
+  document.getElementById("dtTime").textContent = a.time+" (약 "+a.duration+")";
+  document.getElementById("dtPrice").textContent = a.cost;
+  go("detail");
+}
+function openMap(){
+  const a = state.activeActivity;
+  if(!a) return;
+  const g = state.generated || {};
+  // 장소명 + 지역(동네) + 도시 + 국가 로 지도 정확도 향상
+  const parts = [a.name, a.area||"", g.city||"", g.country||""].filter(Boolean);
+  const q = encodeURIComponent(parts.join(" "));
+  window.open("https://www.google.com/maps/search/?api=1&query="+q, "_blank");
+}
+function openBooking(){
+  renderBooking();
+  go("booking");
+}
+
+/* ==================== BOOKING ==================== */
+function renderBooking(){
+  const g = state.generated;
+  const cont = document.getElementById("bookingList");
+  const nights = Math.max(1, g.days.length-1);
+  const items = [
+    { type:"항공 (왕복)", icon:"✈️",
+      name:(g.flight?.out?.airline||"")+" · "+g.flight?.out?.route,
+      price: g.flight?.out?.price || "₩ "+(state.budget*3000).toLocaleString(),
+      link:"https://flights.google.com" },
+    { type:"숙소", icon:"🏨",
+      name:(g.hotel?.name||g.city+" 중심가 호텔")+" · "+nights+"박",
+      price:(g.hotel?.cost||"₩ 140,000/박"),
+      link:"https://www.agoda.com/" },
+    { type:"액티비티", icon:"🎟️",
+      name: g.days[0]?.activities.find(a=>a.localRatio>0)?.name || "현지 투어",
+      price:"₩ 45,000",
+      link:"https://www.klook.com/" },
+    { type:"공항철도", icon:"🚄", name:"인천 ↔ 서울역 왕복",
+      price:"₩ 18,000", link:"https://www.letskorail.com/" }
+  ];
+  const total = state.budget*10000;
+  document.getElementById("bkTotal").textContent = "₩ "+total.toLocaleString();
+  cont.innerHTML = items.map(it =>
+    `<div style="display:flex;gap:12px;padding:14px;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:10px;align-items:center">
+      <div style="width:44px;height:44px;border-radius:12px;background:var(--brand-bg);display:flex;align-items:center;justify-content:center;font-size:22px">${it.icon}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:10px;color:#999;font-weight:700">${it.type}</div>
+        <div style="font-size:13px;font-weight:700;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.name}</div>
+        <div style="font-size:12px;color:var(--green);font-weight:700;margin-top:2px">${it.price}</div>
+      </div>
+      <button class="btn btn-ghost" style="width:auto;padding:8px 14px;font-size:12px" onclick="window.open('${it.link}','_blank')">예약 →</button>
+    </div>`
+  ).join("");
+}
+
+/* ==================== REGEN / SAVE ==================== */
+function regenerate(){
+  go("loading");
+  runLoading();
+}
+function saveTrip(){
+  alert("저장되었습니다 (데모) ♥");
+}
+
+/* ==================== SETTINGS ==================== */
+function saveKey(){
+  const k = document.getElementById("apiKeyInput").value.trim();
+  const m = document.getElementById("modelInput").value.trim() || "gpt-4o-mini";
+  const setErr = document.getElementById("setErr");
+  setErr.classList.remove("on");
+  if(k && !k.startsWith("sk-")){
+    setErr.textContent = "올바른 OpenAI 키 형식이 아닙니다 (sk-...)";
+    setErr.classList.add("on");
+    return;
+  }
+  state.apiKey = k;
+  state.model = m;
+  updateModeBadge();
+  go("splash");
+}
+function clearKey(){
+  state.apiKey = "";
+  document.getElementById("apiKeyInput").value = "";
+  updateModeBadge();
+}
+function updateModeBadge(){
+  const b = document.getElementById("modeBadge");
+  if(!b) return;
+  if(state.apiKey){
+    b.textContent = "✨ AI 모드 ("+state.model+")";
+    b.className = "mode-badge live";
+  } else {
+    b.textContent = "🎭 데모 모드 (API 키 없음)";
+    b.className = "mode-badge demo";
+  }
+}
+
+/* ==================== INIT UI ==================== */
+function initUI(){
+  // 인증 상태 초기화 (세션 복원 or 로그인 화면 유지)
+  try{ initAuth(); }catch(e){}
+
+  // 인기 여행지
+  renderPopular();
+
+  // 스타일 칩 (chip-card 구조: .emj + .lb, 토글: .on)
+  const sg = document.getElementById("styleGrid");
+  sg.innerHTML = STYLES.map(s=>
+    `<div class="chip-card" data-k="${s.key}">
+       <div class="emj">${s.emoji}</div>
+       <div class="lb">${s.label}</div>
+     </div>`
+  ).join("");
+  sg.querySelectorAll(".chip-card").forEach(c=>{
+    c.onclick = ()=>{
+      c.classList.toggle("on");
+      const k = c.dataset.k;
+      if(state.styles.includes(k)) state.styles = state.styles.filter(x=>x!==k);
+      else state.styles.push(k);
+    };
+  });
+  sg.querySelector('[data-k="food"]').classList.add("on");
+  state.styles = ["food"];
+
+  // 동행 칩 (comp-chip, 토글: .on, 단일 선택)
+  const cg = document.getElementById("compGrid");
+  cg.innerHTML = COMPANIONS.map(c=>`<div class="comp-chip" data-k="${c.key}">${c.label}</div>`).join("");
+  cg.querySelectorAll(".comp-chip").forEach(c=>{
+    c.onclick = ()=>{
+      cg.querySelectorAll(".comp-chip").forEach(x=>x.classList.remove("on"));
+      c.classList.add("on");
+      state.companion = c.dataset.k;
+    };
+  });
+  cg.querySelector('[data-k="couple"]').classList.add("on");
+
+  // 예산 슬라이더
+  document.getElementById("budgetSlider").addEventListener("input", updateBudget);
+  updateBudget();
+
+  // 목적지 검색 입력
+  const di = document.getElementById("destInput");
+  di.addEventListener("focus", ()=>renderDestDropdown(di.value));
+  di.addEventListener("input", ()=>{
+    state.destinationKey = "";
+    document.getElementById("destFlag").textContent = "🌏";
+    updatePopularUI();
+    renderDestDropdown(di.value);
+  });
+  document.addEventListener("click", (e)=>{
+    if(!e.target.closest(".dest-search")){
+      document.getElementById("destDropdown").classList.remove("on");
+    }
+  });
+
+  // 초기 뷰
+  go("splash");
+  updateModeBadge();
+}
+window.addEventListener("DOMContentLoaded", initUI);
+</script>
+</body>
+</html>
